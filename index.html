@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El Caso de Ana — Vive Energía</title>
+<meta name="description" content="Juego de decisiones basado en el Protocolo de Violencia Laboral, Acoso y Hostigamiento y en el Código de Ética de Vive Energía, con rol de Evaluador o Evaluado, módulo del Código y calificación de 1 a 10.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef7fb; --bg2:#f3fafd; --card:#ffffff; --line:rgba(0,111,173,.18);
+  --blue:#006fad; --cyan:#0090c9; --aqua:#79ecff; --green:#12b878; --green2:#1fae4b; --red:#d6405f;
+  --text:#2d4756; --muted:#5f7886; --white:#0b3a56;
+  --h:'Montserrat',Arial,Helvetica,sans-serif; --b:'Titillium Web','Montserrat',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--b);font-size:18px;line-height:1.55;color:var(--text);background:var(--bg);min-height:100vh;display:flex;flex-direction:column;
+  background-image:radial-gradient(1100px 560px at 85% -10%,rgba(121,236,255,.55),transparent 60%),radial-gradient(800px 500px at -10% 110%,rgba(18,184,120,.22),transparent 60%);}
+h1,h2,h3{font-family:var(--h);font-weight:700;color:var(--white);line-height:1.2}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 28px;background:linear-gradient(100deg,#006fad,#0a9bc4 60%,#12b878);position:relative;z-index:2;box-shadow:0 4px 18px rgba(0,111,173,.25)}
+header.top svg{height:34px;width:auto;display:block}
+header.top .tag{font-family:var(--h);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#fff}
+main{flex:1;width:100%;max-width:920px;margin:0 auto;padding:28px 20px 130px;position:relative;z-index:2}
+footer{position:relative;z-index:2;text-align:center;font-size:13px;color:var(--muted);padding:14px 20px 22px;border-top:1px solid var(--line);background:rgba(255,255,255,.85)}
+.scene-bg{position:fixed;left:0;right:0;bottom:0;height:150px;z-index:1;pointer-events:none;opacity:.55}
+.blade{transform-origin:center;transform-box:fill-box;animation:spin 14s linear infinite}
+.t2 .blade{animation-duration:19s}.t3 .blade{animation-duration:11s}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.btn{font-family:var(--h);font-weight:700;font-size:16px;letter-spacing:.04em;border:0;border-radius:999px;padding:15px 34px;cursor:pointer;color:#fff;background:linear-gradient(100deg,#006fad,#0a9bc4);transition:.2s;box-shadow:0 6px 18px rgba(0,111,173,.3)}
+.btn:hover,.btn:focus-visible{background:#0a85c8;transform:translateY(-2px)}
+.btn.ghost{background:transparent;border:2px solid var(--blue);color:var(--blue);box-shadow:none}
+.btn.ghost:hover{background:rgba(0,111,173,.08)}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+
+/* intro */
+.hero{text-align:center;padding:30px 0 10px}
+.kicker{font-family:var(--h);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+.hero h1{font-size:clamp(34px,6vw,56px);margin-bottom:18px}
+.hero h1 span{color:var(--cyan)}
+.hero p{max-width:640px;margin:0 auto 14px;color:var(--text)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:30px 0}
+.rule{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;text-align:left}
+.rule b{display:block;font-family:var(--h);color:var(--white);font-size:15px;margin:8px 0 4px}
+.rule small{color:var(--muted);font-size:15px;line-height:1.4;display:block}
+.rule .ico{font-size:26px}
+.note{font-size:14px;color:var(--muted);max-width:640px;margin:22px auto 0}
+
+/* HUD */
+.hud{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.trust{display:flex;align-items:center;gap:8px;font-family:var(--h);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.bolt{width:26px;height:26px;transition:.4s}
+.bolt path{fill:var(--green);filter:drop-shadow(0 0 5px rgba(18,184,120,.45))}
+.bolt.off path{fill:#c5d6de;filter:none}
+.bolt.hit{animation:shake .5s}
+@keyframes shake{25%{transform:translateX(-4px) rotate(-8deg)}75%{transform:translateX(4px) rotate(8deg)}}
+.count{font-family:var(--h);font-weight:700;color:var(--white);font-size:15px}
+.steps{display:flex;gap:6px;margin:6px 0 4px}
+.step{flex:1;text-align:center;font-family:var(--h);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.step i{display:block;height:5px;border-radius:5px;background:#d3e5ee;margin-bottom:6px;overflow:hidden}
+.step i::after{content:"";display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .5s}
+.step.done i::after{width:100%}.step.cur{color:var(--cyan)}.step.cur i::after{width:50%}
+.timer{height:8px;border-radius:8px;background:#d3e5ee;margin:12px 0 20px;overflow:hidden}
+.timer b{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),#0a9bc4);transition:background .3s}
+.timer.low b{background:var(--red)}
+
+/* scene */
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 28px;margin-bottom:20px;animation:rise .4s;box-shadow:0 10px 30px rgba(0,111,173,.10)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.phase{font-family:var(--h);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
+.card h2{font-size:clamp(22px,3.6vw,30px);margin-bottom:14px}
+.narr{color:var(--muted);font-style:italic;margin-bottom:16px}
+.bubble{display:flex;gap:14px;align-items:flex-start;margin:12px 0}
+.av{flex:0 0 46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:grid;place-items:center;font-family:var(--h);font-weight:800;color:#fff;font-size:17px}
+.av.alt{background:#7d97a5}
+.say{background:var(--bg2);border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:12px 16px;color:var(--white)}
+.say small{display:block;font-family:var(--h);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:2px}
+.q{font-family:var(--h);font-weight:700;color:var(--white);font-size:18px;margin:20px 0 4px}
+.opts{display:grid;gap:12px;margin-top:14px}
+.opt{display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;font:inherit;color:var(--text);background:var(--bg2);border:2px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.18s}
+.opt:hover:not(:disabled){border-color:var(--blue);background:#e6f4fb;transform:translateX(3px)}
+.opt .k{flex:0 0 28px;height:28px;border-radius:50%;border:2px solid var(--blue);color:var(--blue);display:grid;place-items:center;font-family:var(--h);font-size:13px;font-weight:700}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--green);background:rgba(18,184,120,.16)}
+.opt.ok .k{background:var(--green);border-color:var(--green);color:#fff}
+.opt.bad{border-color:var(--red);background:rgba(214,64,95,.12)}
+.opt.bad .k{background:var(--red);border-color:var(--red);color:#fff}
+.opt.dim{opacity:.45}
+.fb{border-left:5px solid var(--green);background:var(--card);border-radius:12px;padding:18px 20px;margin-top:18px;animation:rise .35s;border:1px solid var(--line);border-left-width:5px}
+.fb.bad{border-left-color:var(--red)}
+.fb h3{font-size:18px;margin-bottom:6px}
+.fb.good h3{color:#0b8a5a}.fb.bad h3{color:var(--red)}
+.fb .src{margin-top:10px;font-size:14px;color:var(--cyan);font-family:var(--h)}
+.fb .btn{margin-top:16px}
+
+/* end */
+.score{display:flex;justify-content:center;gap:12px;margin:14px 0 6px}
+.score .bolt{width:44px;height:44px}
+.recap{margin:24px 0;display:grid;gap:8px}
+.rrow{display:flex;gap:12px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:16px}
+.rrow .m{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff}
+.rrow .m.ok{background:var(--green)}.rrow .m.no{background:var(--red)}
+.rrow span.s{margin-left:auto;font-size:12px;color:var(--muted);font-family:var(--h);white-space:nowrap}
+.gold{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+.gold div{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:16px}
+.gold b{color:var(--cyan);font-family:var(--h);display:block;font-size:14px;margin-bottom:2px}
+.contact{background:linear-gradient(135deg,rgba(0,144,201,.14),rgba(18,184,120,.18));border:1px solid var(--line);border-radius:16px;padding:18px 22px;margin:20px 0}
+.contact a{color:var(--blue);font-weight:700}
+.center{text-align:center}
+@media (max-width:640px){
+  body{font-size:17px}
+  header.top{padding:14px 16px}header.top svg{height:26px}
+  .rules,.gold{grid-template-columns:1fr}
+  .card{padding:20px 18px}
+  .step{font-size:0}.step i{margin-bottom:0}
+  .rrow{flex-wrap:wrap}.rrow span.s{margin-left:38px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== Aerojandro (asistente informativo) ===== */
+.maji-fab{position:fixed;right:22px;bottom:22px;z-index:50;width:60px;height:60px;border-radius:50%;border:0;cursor:pointer;background:var(--green);color:#fff;display:grid;place-items:center;box-shadow:0 8px 24px rgba(18,184,120,.45);transition:.2s;display:none}
+.maji-fab.show{display:grid;animation:pop .5s}
+.maji-fab:hover{transform:scale(1.07);background:#0fa46c}
+.maji-fab svg{width:40px;height:40px}
+.maji-fab .dot{position:absolute;top:6px;right:6px;width:13px;height:13px;border-radius:50%;background:#ff7a45;border:2px solid #fff}
+.maji-fab.seen .dot{display:none}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.maji-panel{position:fixed;right:22px;bottom:96px;z-index:51;width:380px;max-width:calc(100vw - 24px);height:600px;max-height:calc(100vh - 120px);background:#fff;border-radius:22px;box-shadow:0 24px 60px rgba(7,40,70,.35);border:1px solid var(--line);display:none;flex-direction:column;overflow:hidden;font-family:var(--b)}
+.maji-panel.open{display:flex;animation:rise .3s}
+.maji-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid #e4eef3;background:#fff}
+.maji-av{flex:0 0 46px;height:46px;border-radius:14px;background:var(--green);display:grid;place-items:center;color:#fff}
+.maji-av svg{width:36px;height:36px}
+.maji-head h4{font-family:var(--h);font-size:18px;color:#0b3a56;display:flex;align-items:center;gap:8px;line-height:1.1}
+.maji-head h4 span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:#e3f7ef;color:#0b8a5a;border-radius:999px;padding:3px 8px}
+.maji-head p{font-size:13.5px;color:var(--muted);line-height:1.25;margin-top:3px}
+.maji-x{margin-left:auto;background:none;border:0;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px}
+.maji-x:hover{background:#eef5f8}
+.maji-body{flex:1;overflow-y:auto;padding:16px 16px 8px;background:#f6fbfd;display:flex;flex-direction:column;gap:12px;}
+.mb{max-width:88%;padding:12px 15px;border-radius:16px;font-size:15.5px;line-height:1.45;color:#23424f;animation:rise .3s}
+.mb.bot{align-self:flex-start;background:#fff;border:1px solid #dcebf2;border-top-left-radius:5px}
+.mb.me{align-self:flex-end;background:var(--green);color:#fff;border-top-right-radius:5px;font-weight:600}
+.mb b{color:#0b3a56}
+.mb ul{margin:6px 0 2px 18px}.mb li{margin:2px 0}
+.mb .tag{display:block;margin-top:8px;font-family:var(--h);font-size:11.5px;color:#0a85b8;letter-spacing:.02em}
+.mb a{color:#0a85b8;font-weight:700}
+.typing{display:flex;gap:4px;padding:14px 16px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#9cc3d4;animation:bnc 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bnc{50%{transform:translateY(-5px);opacity:.5}}
+.chips{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:2px}
+.chip{font:inherit;font-size:15px;background:#fff;color:#0b3a56;border:1.5px solid var(--green);border-radius:999px;padding:8px 15px;cursor:pointer;text-align:left;transition:.15s}
+.chip:hover{background:#e3f7ef}
+
+.mb.fade{opacity:0;transform:translateY(-4px);transition:opacity .18s,transform .18s}
+.mb.reveal{animation:reveal .45s cubic-bezier(.2,.7,.2,1)}
+@keyframes reveal{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.chips{transition:opacity .2s}.chips.out{opacity:0}
+.chip{opacity:0;transform:translateY(6px);animation:chipin .35s ease forwards}
+@keyframes chipin{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.mb.reveal,.chip{animation:none;opacity:1;transform:none}}
+.maji-foot{padding:10px 16px 12px;font-size:12.5px;line-height:1.35;color:var(--muted);background:#fff;border-top:1px solid #e4eef3}
+.maji-foot b{color:#0b3a56}
+@media (max-width:640px){
+  .maji-fab{right:14px;bottom:14px;width:56px;height:56px}
+  .maji-panel{right:12px;bottom:80px;max-height:calc(100vh - 100px)}
+}
+
+/* ===== Roles y calificación ===== */
+.pick{font-size:22px;margin:26px 0 12px}
+.roles{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:760px;margin:0 auto}
+.role{font:inherit;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:20px 22px;cursor:pointer;transition:.2s;box-shadow:0 6px 18px rgba(0,111,173,.08);color:var(--text)}
+.role:hover{border-color:var(--blue);transform:translateY(-3px)}
+.role.sel{border-color:var(--green);background:#e9f9f2;box-shadow:0 8px 24px rgba(18,184,120,.25)}
+.role .ico{font-size:28px;display:block;margin-bottom:6px}
+.role b{display:block;font-family:var(--h);font-size:20px;color:var(--white)}
+.role em{display:block;font-style:normal;font-family:var(--h);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:2px 0 8px}
+.role small{display:block;font-size:15.5px;line-height:1.4;color:var(--muted)}
+.btn:disabled{background:#b6cbd6;box-shadow:none;cursor:not-allowed;transform:none}
+.rules{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.rolechip{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:#e3f7ef;color:#0b8a5a;border-radius:999px;padding:3px 10px;margin-right:8px;vertical-align:middle}
+.grade{display:inline-flex;align-items:baseline;gap:6px;margin:14px 0 2px;padding:14px 34px;border-radius:26px;color:#fff;background:linear-gradient(135deg,#006fad,#12b878);box-shadow:0 10px 26px rgba(0,111,173,.3)}
+.grade.mid{background:linear-gradient(135deg,#0a85b8,#e0a800)}
+.grade.lo{background:linear-gradient(135deg,#8a6d8f,#d6405f)}
+.grade .num{font-family:var(--h);font-weight:800;font-size:72px;line-height:1}
+.grade .of{font-family:var(--h);font-weight:700;font-size:24px;opacity:.9}
+.glabel{font-family:var(--h);font-weight:700;font-size:20px;color:var(--white);margin-bottom:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px auto 0;max-width:680px}
+.stats>div{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 10px}
+.stats b{display:flex;justify-content:center;gap:4px;font-family:var(--h);font-size:24px;color:var(--white)}
+.stats .bolt{width:26px;height:26px}
+.stats span{display:block;font-size:13.5px;color:var(--muted);line-height:1.3;margin-top:2px}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.rrow em{font-size:13px;color:var(--muted)}
+@media (max-width:640px){.roles{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.grade .num{font-size:60px}}
+
+.roles{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));max-width:none}
+.chips .gh{font-family:var(--h);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#0a85b8;margin:8px 0 0}
+.chips .gh:first-child{margin-top:0}
+</style>
+</head>
+<body>
+<header class="top">
+  <svg role="img" aria-label="Vive Energía" xmlns="http://www.w3.org/2000/svg" width="198.712" height="43.761" viewBox="0 0 198.712 43.761">
+  <g id="logo_vive_energia_white" transform="translate(-667.612 -789.912)">
+    <path id="Trazado_721" data-name="Trazado 721" d="M697.034,827.929a13.24,13.24,0,1,1-13.24-13.24c.435,0,.865.022,1.289.062L686.676,812a16.177,16.177,0,1,0,13.18,13.951l-2.848,1.139q.026.415.027.836" transform="translate(0 -12.521)" fill="#fff"/>
+    <path id="Trazado_722" data-name="Trazado 722" d="M719.059,789.912s-.346,4.989-.663,6.257c0,0-13.062,7.879-13.69,18.671,0,0,.3-12.154,20.351-20.517a37.185,37.185,0,0,1-2.8,7.122s-15.089,4.7-17.359,13.961c0,0,2.9-11.6,25.721-14.106,0,0-8.622,14.072-22.823,15.485,0,0-2.422,0-2.989-.708,0,0-.99-1.065-.308-5.753.841-5.774,5.8-14.341,14.558-20.413" transform="translate(-21.016)" fill="#fff"/>
+    <path id="Trazado_723" data-name="Trazado 723" d="M934.788,837.833a4.048,4.048,0,0,0-1.012-2.123,3.99,3.99,0,0,0-2.777-.84,7.164,7.164,0,0,0-3.035.939,20.316,20.316,0,0,0-3.531,2.817l.682-3.352h-2.9l-3.239,16h2.895l2.072-10.158a20.25,20.25,0,0,1,1.8-1.611,13.514,13.514,0,0,1,1.566-1.073,5.558,5.558,0,0,1,1.254-.548,4.073,4.073,0,0,1,1.077-.156,2.093,2.093,0,0,1,1.385.365,1.689,1.689,0,0,1,.538,1,4.567,4.567,0,0,1-.017,1.571c-.106.63-.224,1.261-.35,1.877l-1.786,8.737h3.056l1.843-8.985c.131-.6.252-1.288.36-2.055a8.294,8.294,0,0,0,.119-2.4" transform="translate(-144.141 -25.781)" fill="#fff"/>
+    <path id="Trazado_724" data-name="Trazado 724" d="M1006.7,834.926l1.527-.04-.433,1.667c-.077.332-.161.654-.249.963l-.1.348a3.787,3.787,0,0,0-3.552.8,24.611,24.611,0,0,0-3.08,3.3l-1.9,9.287h-3.041l3.306-15.954h2.881l-.879,4.186.037-.044c.456-.546,1.639-2.215,2.165-2.674a6.38,6.38,0,0,1,3.322-1.844" transform="translate(-188.228 -25.789)" fill="#fff"/>
+    <path id="Trazado_725" data-name="Trazado 725" d="M1022.344,858.607a10.04,10.04,0,0,0,2.254.7,13.819,13.819,0,0,0,4.879-.028,8.724,8.724,0,0,0,2.716-1.033,7.965,7.965,0,0,0,2.352-2.089,8.8,8.8,0,0,0,1.688-3.613l3.272-16.52a13.066,13.066,0,0,0-5.6-1.04,11.321,11.321,0,0,0-3.7.6,10.866,10.866,0,0,0-3.11,1.668,9.921,9.921,0,0,0-2.169,2.569,9.022,9.022,0,0,0-1.3,3.2,11.008,11.008,0,0,0-.2,2.96,8.408,8.408,0,0,0,.515,2.886,4.976,4.976,0,0,0,1.56,2.035,4.642,4.642,0,0,0,2.723.78,7.707,7.707,0,0,0,3.353-1.214,15.114,15.114,0,0,0,2.356-1.918l-.542,3.463a9.3,9.3,0,0,1-.872,2.6s-2.287,4.732-9.4.886Zm4.165-13.383a8.036,8.036,0,0,1,.2-2.135,8.218,8.218,0,0,1,.863-2.28,6.178,6.178,0,0,1,1.18-1.781,7.326,7.326,0,0,1,2-1.327,6.556,6.556,0,0,1,2.314-.4,5.748,5.748,0,0,1,1.456.215,4.611,4.611,0,0,1,1.048.459,1.626,1.626,0,0,1,.479.309l.013.014-1.532,7.807a15.228,15.228,0,0,1-2.8,2.242,4.174,4.174,0,0,1-2.18.69c-3.125-.145-3.04-3.812-3.04-3.812" transform="translate(-203.413 -25.839)" fill="#fff"/>
+    <path id="Trazado_726" data-name="Trazado 726" d="M1079.276,816.75l-4.708,5.482h-2.354l3.868-5.482Z" transform="translate(-232.009 -15.39)" fill="#fff"/>
+    <path id="Trazado_727" data-name="Trazado 727" d="M1064.306,851.153h3.034l3.352-16.447h-3.034Z" transform="translate(-227.474 -25.686)" fill="#fff"/>
+    <path id="Trazado_728" data-name="Trazado 728" d="M1098.5,835.936a11.475,11.475,0,0,0-2.3-.723,12.435,12.435,0,0,0-2.9-.24,11.307,11.307,0,0,0-3.71.6,10.984,10.984,0,0,0-3.115,1.746,9.468,9.468,0,0,0-2.182,2.48,8.706,8.706,0,0,0-1.27,3.094,10.484,10.484,0,0,0-.3,2.975,8.33,8.33,0,0,0,.521,2.859,5.522,5.522,0,0,0,1.681,2.259c1.549,1.088,3.452,1.012,5.891-.416a27.851,27.851,0,0,0,2.6-2.1l-.595,2.841h2.941l3.112-15.211Zm-4.558,9.93s-2.936,3.392-5.157,3.095-2.856-2.341-2.8-3.987.456-5.574,3.809-7.2c0,0,3.392-1.449,5.574.555Z" transform="translate(-238.028 -25.84)" fill="#fff"/>
+    <path id="Trazado_729" data-name="Trazado 729" d="M1126.948,840.537v-1.869h.794a1.358,1.358,0,0,1,.436.051.428.428,0,0,1,.217.179.535.535,0,0,1,.081.294.5.5,0,0,1-.123.347.593.593,0,0,1-.37.173.877.877,0,0,1,.2.157,2.111,2.111,0,0,1,.215.3l.229.365h-.451l-.273-.407a2.545,2.545,0,0,0-.2-.275.291.291,0,0,0-.113-.078.624.624,0,0,0-.19-.021h-.076v.78Zm.378-1.079h.279a1.46,1.46,0,0,0,.339-.023.2.2,0,0,0,.106-.079.246.246,0,0,0,.039-.141.222.222,0,0,0-.051-.152.232.232,0,0,0-.142-.073c-.03,0-.123-.006-.276-.006h-.294Z" transform="translate(-263.395 -27.958)" fill="#fff"/>
+    <path id="Trazado_730" data-name="Trazado 730" d="M1126.321,840.194a1.932,1.932,0,1,1,1.931-1.932,1.933,1.933,0,0,1-1.931,1.932m0-3.387a1.455,1.455,0,1,0,1.455,1.455,1.457,1.457,0,0,0-1.455-1.455" transform="translate(-261.928 -26.618)" fill="#fff"/>
+    <path id="Trazado_731" data-name="Trazado 731" d="M765.831,839.237l1.252-2.268a1.963,1.963,0,0,1,1.717-1.014h2.048l-2.631,4.483q-.834,1.442-1.75,2.986t-1.8,3.032c-.589.995-1.173,1.963-1.737,2.878s-1.087,1.756-1.558,2.506l-.117.042H758.6l-2.717-15.927h3.1l1.945,13.282s3.009-6.538,4.9-10" transform="translate(-50.616 -26.403)" fill="#fff"/>
+    <path id="Trazado_732" data-name="Trazado 732" d="M822.055,839.237l1.252-2.268a1.964,1.964,0,0,1,1.718-1.014h2.048l-2.63,4.483q-.834,1.442-1.75,2.986t-1.8,3.032c-.589.995-1.173,1.963-1.737,2.878s-1.088,1.756-1.558,2.506l-.117.042h-2.662l-2.716-15.927h3.1l1.945,13.282s3.009-6.538,4.9-10" transform="translate(-82.856 -26.403)" fill="#fff"/>
+    <path id="Trazado_733" data-name="Trazado 733" d="M790.2,851.883h3.034l3.352-15.927h-3.034Z" transform="translate(-70.293 -26.403)" fill="#fff"/>
+    <path id="Trazado_734" data-name="Trazado 734" d="M802.76,820.428a2.039,2.039,0,1,1-2.039-2.038,2.039,2.039,0,0,1,2.039,2.038" transform="translate(-75.159 -16.33)" fill="#fff"/>
+    <path id="Trazado_735" data-name="Trazado 735" d="M894.508,842.839a4.043,4.043,0,0,0,2.635-4.847c-.706-3.138-4.457-2.991-4.457-2.991a8.384,8.384,0,0,0-3.461.7,9.545,9.545,0,0,0-2.738,1.843,10.209,10.209,0,0,0-1.948,2.6,11.331,11.331,0,0,0-1.073,2.969,11.074,11.074,0,0,0-.189,3.266,6.945,6.945,0,0,0,.839,2.743,5.038,5.038,0,0,0,1.919,1.914,5.876,5.876,0,0,0,2.937.693,8.259,8.259,0,0,0,3.657-.859,12.433,12.433,0,0,0,2.806-1.761l.147-.139.245-2.194-.237.188a16.06,16.06,0,0,1-2.739,1.69,6.785,6.785,0,0,1-2.877.583,3.572,3.572,0,0,1-2.007-.613,3.413,3.413,0,0,1-1.125-1.337,4.166,4.166,0,0,1-.43-1.691,11.226,11.226,0,0,1,.047-1.681c5.773.11,8.048-1.082,8.048-1.082m-4.91-5.067a4.484,4.484,0,0,1,3.61-.278,2.143,2.143,0,0,1,.737,3.15c-1.307,1.91-7.152,1.5-7.152,1.5a5.934,5.934,0,0,1,2.8-4.377" transform="translate(-123.641 -25.854)" fill="#fff"/>
+    <path id="Trazado_736" data-name="Trazado 736" d="M971.469,842.839a4.042,4.042,0,0,0,2.635-4.847c-.706-3.138-4.456-2.991-4.456-2.991a8.384,8.384,0,0,0-3.461.7,9.536,9.536,0,0,0-2.738,1.843,10.2,10.2,0,0,0-1.948,2.6,11.3,11.3,0,0,0-1.073,2.969,11.071,11.071,0,0,0-.189,3.266,6.957,6.957,0,0,0,.839,2.743A5.05,5.05,0,0,0,963,851.04a5.879,5.879,0,0,0,2.937.693,8.26,8.26,0,0,0,3.657-.859,12.427,12.427,0,0,0,2.805-1.761l.148-.139.245-2.194-.237.188a16.1,16.1,0,0,1-2.739,1.69,6.785,6.785,0,0,1-2.877.583,3.571,3.571,0,0,1-2.007-.613,3.407,3.407,0,0,1-1.125-1.337,4.151,4.151,0,0,1-.431-1.691,11.12,11.12,0,0,1,.047-1.681c5.772.11,8.047-1.082,8.047-1.082m-4.909-5.067a4.482,4.482,0,0,1,3.609-.278,2.143,2.143,0,0,1,.738,3.15c-1.307,1.91-7.152,1.5-7.152,1.5a5.933,5.933,0,0,1,2.806-4.377" transform="translate(-167.772 -25.854)" fill="#fff"/>
+    <path id="Trazado_737" data-name="Trazado 737" d="M857.676,842.839a4.042,4.042,0,0,0,2.635-4.847c-.706-3.138-4.456-2.991-4.456-2.991a8.386,8.386,0,0,0-3.461.7,9.532,9.532,0,0,0-2.737,1.843,10.2,10.2,0,0,0-1.949,2.6,11.33,11.33,0,0,0-1.073,2.969,11.045,11.045,0,0,0-.188,3.266,6.929,6.929,0,0,0,.839,2.743,5.04,5.04,0,0,0,1.919,1.914,5.879,5.879,0,0,0,2.937.693,8.258,8.258,0,0,0,3.657-.859,12.423,12.423,0,0,0,2.805-1.761l.148-.139.245-2.194-.238.188a16.073,16.073,0,0,1-2.739,1.69,6.784,6.784,0,0,1-2.876.583,3.573,3.573,0,0,1-2.007-.613,3.407,3.407,0,0,1-1.125-1.337,4.138,4.138,0,0,1-.43-1.691,11.154,11.154,0,0,1,.047-1.681c5.772.11,8.047-1.082,8.047-1.082m-4.909-5.067a4.483,4.483,0,0,1,3.609-.278,2.143,2.143,0,0,1,.737,3.15c-1.307,1.91-7.151,1.5-7.151,1.5a5.935,5.935,0,0,1,2.805-4.377" transform="translate(-102.521 -25.854)" fill="#fff"/>
+  </g>
+</svg>
+
+  <span class="tag">Prevención de violencia laboral</span>
+</header>
+
+<svg class="scene-bg" viewBox="0 0 1200 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <path d="M0 150 L0 128 Q150 108 300 124 T600 118 T900 126 T1200 112 L1200 150Z" fill="#bfe3d6"/>
+  <g stroke="#7fb6cf" stroke-width="3" fill="none">
+    <path d="M180 124 V54"/><path d="M640 120 V40"/><path d="M1000 124 V62"/>
+  </g>
+  <g class="t1"><g class="blade" stroke="#0090c9" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M180 54 L180 14 M180 54 L214 74 M180 54 L146 74"/></g></g>
+  <g class="t2"><g class="blade" stroke="#0090c9" stroke-width="3.5" stroke-linecap="round" opacity=".7"><path d="M640 40 L640 -6 M640 40 L680 63 M640 40 L600 63"/></g></g>
+  <g class="t3"><g class="blade" stroke="#0090c9" stroke-width="3" stroke-linecap="round" opacity=".7"><path d="M1000 62 L1000 26 M1000 62 L1031 80 M1000 62 L969 80"/></g></g>
+</svg>
+
+
+<button class="maji-fab" id="majiFab" aria-label="Abrir a Aerojandro, asistente informativo" aria-expanded="false" aria-controls="majiPanel">
+  <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="10" cy="12" r="7" fill="#2b2f33"/><circle cx="38" cy="12" r="7" fill="#2b2f33"/><circle cx="24" cy="26" r="18" fill="#ffffff"/><ellipse cx="16.2" cy="23.5" rx="4.6" ry="5.6" fill="#2b2f33" transform="rotate(-18 16.2 23.5)"/><ellipse cx="31.8" cy="23.5" rx="4.6" ry="5.6" fill="#2b2f33" transform="rotate(18 31.8 23.5)"/><circle cx="16.8" cy="23.2" r="2" fill="#fff"/><circle cx="31.2" cy="23.2" r="2" fill="#fff"/><circle cx="17.2" cy="23.4" r="1.1" fill="#2b2f33"/><circle cx="30.8" cy="23.4" r="1.1" fill="#2b2f33"/><ellipse cx="10.8" cy="31" rx="2.8" ry="1.8" fill="#f7a3b3" opacity=".8"/><ellipse cx="37.2" cy="31" rx="2.8" ry="1.8" fill="#f7a3b3" opacity=".8"/><ellipse cx="24" cy="29.4" rx="3" ry="2.1" fill="#2b2f33"/><path d="M24 31.4v2M24 33.4c-1.2 1.6-3.2 1.6-4.2.4M24 33.4c1.2 1.6 3.2 1.6 4.2.4" stroke="#2b2f33" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>
+  <span class="dot"></span>
+</button>
+<section class="maji-panel" id="majiPanel" role="dialog" aria-label="Aerojandro, asistente informativo">
+  <div class="maji-head">
+    <div class="maji-av"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="10" cy="12" r="7" fill="#2b2f33"/><circle cx="38" cy="12" r="7" fill="#2b2f33"/><circle cx="24" cy="26" r="18" fill="#ffffff"/><ellipse cx="16.2" cy="23.5" rx="4.6" ry="5.6" fill="#2b2f33" transform="rotate(-18 16.2 23.5)"/><ellipse cx="31.8" cy="23.5" rx="4.6" ry="5.6" fill="#2b2f33" transform="rotate(18 31.8 23.5)"/><circle cx="16.8" cy="23.2" r="2" fill="#fff"/><circle cx="31.2" cy="23.2" r="2" fill="#fff"/><circle cx="17.2" cy="23.4" r="1.1" fill="#2b2f33"/><circle cx="30.8" cy="23.4" r="1.1" fill="#2b2f33"/><ellipse cx="10.8" cy="31" rx="2.8" ry="1.8" fill="#f7a3b3" opacity=".8"/><ellipse cx="37.2" cy="31" rx="2.8" ry="1.8" fill="#f7a3b3" opacity=".8"/><ellipse cx="24" cy="29.4" rx="3" ry="2.1" fill="#2b2f33"/><path d="M24 31.4v2M24 33.4c-1.2 1.6-3.2 1.6-4.2.4M24 33.4c1.2 1.6 3.2 1.6 4.2.4" stroke="#2b2f33" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></div>
+    <div><h4>Aerojandro <span>Informativo</span></h4><p>Asistente de la política de Vive Energía</p></div>
+    <button class="maji-x" id="majiX" aria-label="Cerrar">×</button>
+  </div>
+  <div class="maji-body" id="majiBody"></div>
+  <div class="maji-foot"><b>Aerojandro no recibe denuncias</b> ni sustituye al Comité. Respuestas fijas basadas en documentos oficiales. Denuncias: <b>denuncias@viveenergia.com</b> · 99 9219 7812 · 55 8554 7868</div>
+</section>
+
+<main id="app" aria-live="polite"></main>
+<footer>© Vive Energía · Juego informativo basado en el Código de Ética (VE-3-PO-03), el Reglamento Interior de Trabajo (VE-3-PO-01), el Protocolo VE-5-PR-04, las Políticas VE-5-PO-04 y VE-5-PO-03, la Guía VE-5-I-04 y los formatos VE-5-F-34 a VE-5-F-38. Personajes y situaciones ficticios. No sustituye el análisis del Comité de Atención y Seguimiento.</footer>
+
+<script>
+const BOLT='<svg class="bolt %C%" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>';
+const TIME=60, MAXTRUST=3;
+const PHASES=['Identificar','Denunciar','Proteger','Investigar','Resolver','Reparar'];
+
+const ROLES={
+evaluador:{
+ name:'Evaluador',
+ tag:'Rol: Evaluador',
+ start:'Comenzar como Evaluador',
+ intro:'Eres persona consejera del Comité de Atención y Seguimiento. Recibes a Ana y conduces el procedimiento del Protocolo, desde la recepción hasta el seguimiento.',
+ scenes:[
+{ph:0,title:'Alguien necesita hablar contigo',
+ narr:'Eres persona consejera del Comité de Atención y Seguimiento. Un jueves, Ana, de Operaciones en la oficina de Mérida, pide hablar contigo en privado.',
+ who:'Ana',say:'¿Tienes un minuto? Mi jefe, Ricardo, me grita en las juntas y me escribe a las 11 de la noche. Ayer me dijo que “con ese vestido no iba a necesitar proyecto para ascender”. No sé si estoy exagerando…',
+ q:'¿Cómo inicias la atención?',src:'Protocolo VE-5-PR-04 · 6 Principios de actuación; Acta VE-5-F-36 · Avisos previos',
+ opts:[
+ {t:'La escuchas con calma, le aseguras la confidencialidad, le explicas que no tendrá que repetir los hechos de más y le ofreces el acompañamiento de una persona consejera mujer u hombre, como ella prefiera.',ok:1,fb:'La atención inicia sin cuestionar a la persona: confidencialidad, no revictimización y la posibilidad de elegir el sexo de la persona consejera, sobre todo en casos de violencia sexual.'},
+ {t:'Le pides que escriba primero todo con fechas y horas y que reúna pruebas, para atenderla ya con el expediente completo.',fb:'Condicionar la atención a tener todo por escrito es un obstáculo. Quien recibe puede documentar el relato en el formato VE-5-F-34 y la ratificación por escrito llega después.'},
+ {t:'Le explicas que Ricardo seguramente no quiso ofenderla, que es de trato franco, y le sugieres dejarlo pasar.',fb:'Minimizar o apelar a la intención desatiende el impacto en la persona. Con comentarios sexuales y una relación de poder, el caso debe atenderse.'},
+ {t:'Le preguntas qué vestía ese día y si antes había tenido confianza con Ricardo, para entender el contexto completo.',fb:'Las preguntas sobre vestimenta, conducta previa o vida personal se basan en estereotipos y revictimizan; el Acta VE-5-F-36 pide evitarlas.'}]},
+
+{ph:0,title:'¿Qué tipo de conducta es?',
+ narr:'Ana te cuenta que Ricardo decide sus horarios y proyectos, que el comentario sobre el vestido fue una sola vez y que los mensajes nocturnos llegan por el chat de trabajo.',
+ who:'Ana',say:'Lo del vestido fue una sola vez… pero los gritos y los mensajes son seguidos. ¿Cuenta si no me tocó ni nada?',
+ q:'Con los criterios del Protocolo y de la Guía, ¿cómo analizas la situación?',src:'Protocolo VE-5-PR-04 · 7.2 Identificación y diagnóstico; Guía VE-5-I-04 · 4.4 Criterios',
+ opts:[
+ {t:'Hay subordinación y un comentario de connotación sexual, así que puede ser hostigamiento sexual aunque haya sido una vez; los gritos y mensajes se analizan además como posible acoso laboral.',ok:1,fb:'Si existe subordinación se trata de hostigamiento; en el hostigamiento y el acoso sexual basta un solo evento, los medios digitales cuentan y se valora el impacto, no la intención.'},
+ {t:'Sería acoso sexual, porque no hubo contacto físico y el hostigamiento requiere una agresión física.',fb:'No se requiere contacto físico. La diferencia es la jerarquía: con subordinación es hostigamiento; sin ella, acoso sexual.'},
+ {t:'Todavía no se puede clasificar: hay que esperar a que el comentario sobre el vestido se repita y forme un patrón.',fb:'El patrón de conductas es propio del acoso laboral; el hostigamiento y el acoso sexual se configuran con un solo evento.'},
+ {t:'Es solo acoso laboral, porque el comentario sobre el vestido parece menor frente a los gritos.',fb:'La gravedad aparente no es un criterio para degradar o descartar un caso. Se analizan el contenido, la relación de poder y el impacto.'}]},
+
+{ph:1,title:'Canal y registro de la denuncia',
+ narr:'Ana decide presentar su denuncia ahí mismo, de palabra.',
+ who:'Ana',say:'Quiero denunciar, pero me da miedo que Ricardo se entere antes de tiempo. ¿Cómo lo hacemos?',
+ q:'¿Cómo recibes y registras la denuncia?',src:'Protocolo VE-5-PR-04 · 9.1 Canales y 9.6 paso 1; Formato VE-5-F-34; Bitácora VE-5-F-37',
+ opts:[
+ {t:'La documentas en el formato VE-5-F-34, le pides que la ratifique por escrito, le entregas clave única y acuse, y la anotas en la Bitácora VE-5-F-37 con la clave y sin nombres.',ok:1,fb:'Una denuncia verbal se documenta en el F-34 y debe ratificarse por escrito para iniciar el procedimiento formal. Toda denuncia recibe clave y acuse, y la bitácora es confidencial: se identifica por clave.'},
+ {t:'La recibes como reporte anónimo para protegerla y le dices que el Comité actuará de oficio.',fb:'Los reportes anónimos no inician un procedimiento formal. Ana perdería, entre otras cosas, el derecho a conocer el estado del procedimiento y participar en él.'},
+ {t:'La registras en la bitácora con los nombres completos de Ana y de Ricardo para no confundir expedientes.',fb:'La Bitácora VE-5-F-37 es confidencial: cada caso se identifica por su clave única y no se anotan nombres.'},
+ {t:'Le sugieres hablar primero con Ricardo para darle oportunidad de corregirse, y volver si la conducta continúa.',fb:'No se expone a la presunta víctima a confrontar a quien tiene poder sobre ella. El Protocolo ofrece canales propios y nunca la obliga a conciliar.'}]},
+
+{ph:1,title:'Las pruebas',
+ narr:'Ana trae capturas de pantalla de algunos mensajes del chat y menciona que una compañera, Lucía, presenció los gritos en una junta. Nadie escuchó lo del vestido.',
+ who:'Ana',say:'Sin una grabación, ¿mi denuncia cuenta?',
+ q:'¿Qué le respondes sobre las pruebas?',src:'Protocolo VE-5-PR-04 · 9.2 Pruebas; Formato VE-5-F-34 · sección 5',
+ opts:[
+ {t:'Que anexe las capturas y mencione a Lucía en el F-34: su testimonio tiene especial relevancia y el Comité reconstruirá el contexto con comunicaciones, cronología y testigos.',ok:1,fb:'Estas conductas suelen ocurrir en privado, por lo que el testimonio se valora con perspectiva de género junto con los indicios. No se exige prueba directa.'},
+ {t:'Que consiga primero una grabación o un segundo testigo del comentario del vestido; de lo contrario la denuncia será improcedente.',fb:'No es un requisito. La improcedencia se da por falta de conducta prevista, por no subsanar la prevención o por no ratificar, no por falta de grabación.'},
+ {t:'Que, con discreción, revise el correo y el celular de Ricardo para completar la evidencia.',fb:'Vigilar o espiar a una persona es una conducta prohibida; la evidencia corporativa la revisa el Comité por las vías institucionales.'},
+ {t:'Que no hace falta más: el Comité resolverá solo con el relato de Ana, sin revisar comunicaciones ni testigos.',fb:'La perspectiva de género no elimina la necesidad de prueba: el Comité debe reconstruir el contexto y valorar los indicios.'}]},
+
+{ph:2,title:'Medidas de protección',
+ narr:'La denuncia ya tiene clave y acuse. Ricardo sigue siendo el jefe directo de Ana y mañana hay junta de equipo.',
+ who:'Ana',say:'Mañana tengo que verlo en la junta y no quiero estar cerca de él.',
+ q:'¿Qué haces respecto de las medidas de protección?',src:'Protocolo VE-5-PR-04 · 9.4 Medidas de protección y 9.6 paso 1; Formato VE-5-F-35 · sección 2',
+ opts:[
+ {t:'Evalúas medidas inmediatas en las 24 h siguientes, como prohibición de contacto, cambio de horario de Ricardo, home office temporal o apoyo psicológico, sin prejuzgar, y las registras en el F-35 con responsable y fechas.',ok:1,fb:'Pueden dictarse desde que hay conocimiento de los hechos y en cualquier etapa, a petición de parte o de oficio, sin prejuzgar. Cada medida se documenta en el F-35.'},
+ {t:'Esperas a que el Comité acuerde la admisión para dictar medidas, a fin de no prejuzgar a Ricardo.',fb:'Las medidas no esperan a la admisión: se evalúan dentro de las 24 horas siguientes y no prejuzgan la veracidad de los hechos.'},
+ {t:'Propones mover a Ana de área mientras dura la investigación, para que ya no coincida con él.',fb:'La reubicación recae en la persona presuntamente agresora; la de la presunta víctima solo si ella lo solicita, sin afectar sus derechos laborales.'},
+ {t:'Propones suspender a Ricardo sin goce de sueldo desde hoy, hasta que se resuelva el caso.',fb:'La suspensión es una medida disciplinaria que solo procede después del procedimiento y de la audiencia; las medidas de protección no son sanciones.'}]},
+
+{ph:2,title:'Admisión y plazos',
+ narr:'Al revisar la denuncia, la Secretaría Ejecutiva nota que Ana no anotó la fecha exacta del primer mensaje nocturno ni el lugar del comentario.',
+ who:'Secretaría Ejecutiva',alt:1,say:'Faltan datos de modo, tiempo y lugar. ¿Cómo manejamos los plazos?',
+ q:'¿Qué corresponde?',src:'Protocolo VE-5-PR-04 · 9.3 Admisión y 9.6 paso 2; Formato VE-5-F-35 · sección 1',
+ opts:[
+ {t:'Prevenir a Ana para que complete los datos en 3 días hábiles; el Comité acuerda la admisión dentro de 5 días hábiles y la notifica por escrito con fundamento y motivo.',ok:1,fb:'La prevención da 3 días hábiles; la admisión se acuerda en 5 días hábiles desde la recepción y se notifica por escrito, dejando constancia de la revisión de conflictos de interés.'},
+ {t:'Declarar improcedente la denuncia de inmediato por datos incompletos, para que presente una nueva.',fb:'Si falta información se previene a la persona denunciante; la improcedencia solo procede si no se subsana.'},
+ {t:'Esperar a que Ana la complete cuando pueda; el plazo de admisión corre hasta tener el expediente completo.',fb:'Hay plazos definidos: 3 días hábiles para la prevención y 5 días hábiles para acordar la admisión.'},
+ {t:'Admitirla de inmediato y completar los datos durante la investigación, sin notificarlo por escrito.',fb:'La admisión o la improcedencia se acuerdan y se notifican por escrito, con su fundamento y motivación.'}]},
+
+{ph:3,title:'Conflicto de interés',
+ narr:'Al asignar el caso, una integrante del Comité, Carmen, te comenta que Ricardo es su amigo cercano desde hace años.',
+ who:'Carmen (Comité)',alt:1,say:'Yo puedo llevar la entrevista, soy muy objetiva. Además, así Ricardo se sentirá en confianza.',
+ q:'¿Qué corresponde?',src:'Protocolo VE-5-PR-04 · 8.3 Perfil de las personas integrantes; Formato VE-5-F-35 · sección 1; Reglamento VE-3-PO-01 · art. 27, inciso V',
+ opts:[
+ {t:'Que se excuse del caso y sea sustituida mientras se resuelve; antes de asignarlo, el Comité deja constancia de que quienes intervienen no tienen conflicto de interés.',ok:1,fb:'La amistad cercana obliga a excusarse. La constancia se registra en el F-35 y en la bitácora. Ocultar un conflicto de interés es una conducta prohibida.'},
+ {t:'Que participe, pero sin votar en el dictamen, para aprovechar la confianza que tiene con Ricardo.',fb:'Debe excusarse del caso completo; participar parcialmente compromete la imparcialidad del procedimiento.'},
+ {t:'Que intervenga solo en las entrevistas a testigos, donde su amistad no influye.',fb:'La excusa se refiere al caso, no a una etapa. Su cercanía podría influir también en testigos.'},
+ {t:'Que ella decida si existe conflicto, pues conoce mejor su relación con Ricardo.',fb:'La verificación y la constancia son del Comité y quedan documentadas; no depende de una decisión individual.'}]},
+
+{ph:3,title:'La entrevista a Ana',
+ narr:'El Comité cita a Ana a una entrevista y tú la acompañas, a petición suya.',
+ who:'Integrante del Comité',alt:1,say:'Para la entrevista, ¿cómo la conducimos y qué le informamos antes?',
+ q:'¿Cómo conduces la diligencia?',src:'Acta VE-5-F-36 · Avisos previos y Declaración; Protocolo VE-5-PR-04 · 6 y 9.6 paso 3',
+ opts:[
+ {t:'Se leen los avisos previos, se permiten pausas, se recoge su relato con sus propias palabras sin preguntas sobre su vestimenta o vida personal, y se le entrega copia de su declaración.',ok:1,fb:'El acta prevé avisos previos, pausas, acompañamiento de la persona consejera y evitar preguntas que culpen o revictimicen. Se entrega copia de la declaración.'},
+ {t:'Se le pregunta con detalle cómo iba vestida y si antes había coqueteado, para valorar el contexto.',fb:'Esas preguntas se basan en estereotipos y revictimizan; el Acta VE-5-F-36 pide expresamente evitarlas.'},
+ {t:'Se le pide repetir su relato ante el pleno del Comité en cada sesión, para que todos lo escuchen directamente.',fb:'Se evita exponerla a narrar los hechos varias veces: la declaración queda en el acta.'},
+ {t:'Se le cita junto con Ricardo para que cada quien dé su versión frente a la otra persona y se aclaren las contradicciones.',fb:'En ningún caso habrá careo ni confrontación con la persona señalada.'}]},
+
+{ph:3,title:'La declaración de Ricardo',
+ narr:'Toca citar a Ricardo. Llega molesto y asegura que Ana “se está inventando todo”.',
+ who:'Ricardo',alt:1,say:'No entiendo de qué se me acusa. Fue una broma y, si Ana se ofendió, no es mi culpa.',
+ q:'¿Cómo conduces su declaración?',src:'Protocolo VE-5-PR-04 · 9.5 Derechos de las partes y 9.6 paso 4; Acta VE-5-F-36',
+ opts:[
+ {t:'Le informas por escrito los hechos que se le atribuyen, su derecho a defenderse y a la presunción de inocencia, recabas su declaración y pruebas, y le das copia; el impacto en Ana se valora aunque diga que fue broma.',ok:1,fb:'La persona señalada debe conocer los hechos, ser escuchada y ofrecer pruebas. Importa el efecto en la persona afectada, no la intención de quien actuó.'},
+ {t:'Lo citas sin precisarle los hechos, para que no prepare una versión y su relato sea más espontáneo.',fb:'Debe conocer los hechos que se le atribuyen para poder ejercer su defensa.'},
+ {t:'Das por cerrada su declaración al decir que fue una broma, porque sin intención no hay conducta que valorar.',fb:'La intención no es el criterio: se analiza el impacto en la persona afectada y la relación de poder.'},
+ {t:'Lo invitas a confrontar a Ana en la siguiente sesión para que ella reconozca que fue una broma.',fb:'No hay careo ni confrontación, y la presunta víctima no está obligada a enfrentar a la persona señalada.'}]},
+
+{ph:4,title:'El dictamen',
+ narr:'Con las declaraciones, las capturas y el testimonio de Lucía, el Comité sesiona en pleno. Ricardo insiste en que no hay prueba directa del comentario sobre el vestido.',
+ who:'Integrante del Comité',alt:1,say:'Sin una grabación del comentario, ¿podemos tener por acreditados los hechos?',
+ q:'¿Cómo debe fundarse el dictamen?',src:'Protocolo VE-5-PR-04 · 9.7 Obligaciones del Comité al resolver; Formato VE-5-F-35 · sección 4',
+ opts:[
+ {t:'Valorando los indicios (mensajes, cronología, testigos, cambios de funciones) y el testimonio de Ana con perspectiva de género, y dejando constancia del contexto, la relación de poder, los estereotipos descartados y las razones de la conclusión.',ok:1,fb:'Los hechos pueden acreditarse con indicios suficientes. Mencionar la perspectiva de género no basta: el dictamen debe documentar cómo se aplicó.'},
+ {t:'No acreditando el comentario por falta de prueba directa y resolviendo solo sobre los gritos y los mensajes.',fb:'La falta de prueba directa no impide acreditar por indicios; no se invisibilizan hechos que ocurren en privado.'},
+ {t:'Señalando que se aplicó la perspectiva de género, sin detallar el análisis, para no extender el dictamen.',fb:'La sola mención no es suficiente: debe quedar constancia de la metodología aplicada.'},
+ {t:'Considerando la antigüedad y el buen desempeño de Ricardo como atenuantes que descartan la conducta.',fb:'La categoría o el nivel jerárquico de las personas involucradas no justifica dejar de investigar ni descarta una conducta acreditada.'}]},
+
+{ph:4,title:'Sanción y acuerdo reparatorio',
+ narr:'El Comité acredita hostigamiento sexual. Ricardo propone resolverlo con una disculpa y una plática con Ana.',
+ who:'Ricardo',alt:1,say:'Estoy dispuesto a pedir disculpas y dejarlo así. No hace falta llegar a más.',
+ q:'¿Qué corresponde?',src:'Protocolo VE-5-PR-04 · 10.1 Acuerdo reparatorio y 10.2 Sanciones; Reglamento VE-3-PO-01 · art. 48',
+ opts:[
+ {t:'No procede el acuerdo reparatorio en conductas sexuales ni se obliga a Ana a conciliar; el Comité propone la medida (la rescisión requiere aprobación de la Presidencia y opinión de Jurídica) y RH la aplica conforme al art. 48 del Reglamento.',ok:1,fb:'El hostigamiento o acoso sexual puede dar lugar a la rescisión sin responsabilidad para el patrón. RH sigue el procedimiento: notificación escrita, audiencia y resolución por acta.'},
+ {t:'Aceptar la disculpa como acuerdo reparatorio si Ana lo acepta libremente y Ricardo reconoce su responsabilidad.',fb:'El acuerdo reparatorio solo procede en violencia laboral que no sea sexual ni física.'},
+ {t:'Proponer solo una limitación de promociones por seis meses, por tratarse de su primera falta.',fb:'La limitación de promociones corresponde a violencia no sexual ni física; el hostigamiento sexual puede actualizar la rescisión (LFT, art. 47).'},
+ {t:'Que RH rescinda el contrato de inmediato, sin audiencia, porque el dictamen ya acreditó los hechos.',fb:'La rescisión requiere el procedimiento del art. 48 (notificación, audiencia y acta) y que se actualice una causa legal; no es automática.'}]},
+
+{ph:5,title:'Seguimiento y represalias',
+ narr:'Pasan unas semanas. Ana te cuenta que, desde la resolución, la dejan fuera de reuniones y que en su última evaluación recibió una nota baja sin justificación.',
+ who:'Ana',say:'No me dijeron nada directo, pero me siento aislada. ¿Esto cuenta?',
+ q:'¿Qué haces?',src:'Protocolo VE-5-PR-04 · 9.4 (seguimiento de represalias) y 10.4 Reparación; Formato VE-5-F-35 · sección 5',
+ opts:[
+ {t:'Lo tratas como una posible represalia indirecta: la documentas, la llevas al Comité para ampliar medidas y continúas la verificación de no represalias a 1, 3 y 6 meses.',ok:1,fb:'Las represalias incluyen las indirectas: exclusión de reuniones o evaluaciones desfavorables sin justificación. El seguimiento se documenta en el F-35.'},
+ {t:'Le explicas que, al no existir una orden directa, no es una represalia, y que espere a la siguiente evaluación.',fb:'No se requiere una orden directa: las represalias indirectas también están prohibidas y se sancionan.'},
+ {t:'Sugieres cerrar el expediente porque el procedimiento ya concluyó y esto sería otro asunto.',fb:'El seguimiento posterior al cierre forma parte de la trazabilidad y de la reparación.'},
+ {t:'Le pides que se cambie de área para evitar roces, porque así se aíslan los problemas.',fb:'No se impone a la víctima un cambio de área; las medidas de reparación se consultan con ella.'}]},
+
+{ph:5,title:'Prevención y registro',
+ narr:'Para cerrar, el Comité revisa qué hará para evitar que algo así se repita, sobre todo en áreas de mayoría masculina.',
+ who:'Secretaría Ejecutiva',alt:1,say:'Hay que dejar constancia de lo que hagamos. ¿Qué acciones definimos y cómo las registramos?',
+ q:'¿Qué propones?',src:'Protocolo VE-5-PR-04 · 7.3 Capacitación anual y 10.3 Medidas de modificación de conducta; Bitácora VE-5-F-38',
+ opts:[
+ {t:'Sensibilización del área y capacitación anual con perspectiva de género en tres niveles (todo el personal, mandos y Comité), registrando fecha, tema, asistencia, cobertura y evaluación en la VE-5-F-38.',ok:1,fb:'La capacitación anual es obligatoria, con contenidos diferenciados, y RH conserva listas, constancias y evaluación; el Comité evalúa la eficacia con indicadores.'},
+ {t:'Una circular informativa y una charla opcional, sin registrar la asistencia para no exponer a las personas.',fb:'La capacitación debe ser obligatoria y dejar evidencia (listas, constancias y evaluación) en la bitácora VE-5-F-38.'},
+ {t:'Capacitar solo al área del caso con una sesión única de una hora, para no alarmar a la organización.',fb:'La capacitación anual alcanza a todo el personal, no solo al área donde ocurrió el caso.'},
+ {t:'Capacitar a todo el personal con el mismo contenido, sin distinguir entre mandos y Comité, para simplificar.',fb:'Son tres niveles diferenciados, con contenidos acordes al papel de cada grupo.'}]}
+ ]},
+
+evaluado:{
+ name:'Evaluado',
+ tag:'Rol: Evaluado',
+ start:'Comenzar como Evaluado',
+ intro:'Eres Ricardo Salas, la persona señalada en la denuncia de Ana. Vives el procedimiento desde tus derechos y obligaciones: cómo reaccionar, cooperar y evitar represalias.',
+ scenes:[
+{ph:0,title:'Un comentario que incomodó',
+ narr:'Eres Ricardo Salas, jefe de área de Operaciones en Mérida. Tras una junta, un colega de confianza te toma aparte.',
+ who:'Colega',alt:1,say:'Oye, lo que le dijiste a Ana sobre su vestido la incomodó, y los mensajes de las 11 de la noche también. Te lo digo porque creo que no te das cuenta.',
+ q:'¿Cómo reaccionas?',src:'Guía VE-5-I-04 · 4.4 Criterios (impacto y consentimiento) y 4.5 Reglas de oro',
+ opts:[
+ {t:'Escuchas sin justificarte, reconoces que importa el efecto y no tu intención, dejas esos comentarios y mensajes, y revisas la Guía para entender qué conductas no son aceptables.',ok:1,fb:'Importa el impacto en la persona, no la intención. Reglas de oro: no supongas, respeta el espacio personal y comunica. Corregir a tiempo evita daño.'},
+ {t:'Explicas que fue un halago y que Ana no dijo nada en el momento, así que no hubo problema.',fb:'El silencio o la falta de oposición no equivalen a consentimiento, y menos aún cuando existe subordinación.'},
+ {t:'Dices que Ana exagera, porque en el área todos bromean así.',fb:'Que algo sea común en un área no lo vuelve aceptable. Importan el impacto y la relación de poder.'},
+ {t:'Le pides a tu colega que no se meta, porque son asuntos entre tú y Ana.',fb:'Ignorar la señal impide corregir. Como jefe, tienes además la obligación de prevenir y canalizar situaciones de violencia.'}]},
+
+{ph:0,title:'¿Qué sí y qué no es violencia laboral?',
+ narr:'Quieres autocorregirte. Repasas tus conductas habituales con la tabla de la Guía auxiliar.',
+ who:'Tú',alt:1,say:'A ver qué es y qué no es violencia laboral, según la Guía…',
+ q:'¿Cuál de estas conductas, por sí misma, SÍ puede constituir violencia laboral?',src:'Guía VE-5-I-04 · 4.3 Qué es y qué no es violencia laboral',
+ opts:[
+ {t:'Escribirle a Ana de forma insistente fuera de horario y hacerle comentarios con doble sentido sobre su cuerpo o su vestimenta.',ok:1,fb:'Los mensajes insistentes fuera de horario y los comentarios de connotación sexual no deseados sí pueden ser violencia, y aquí hay relación de poder.'},
+ {t:'Hacerle una llamada de atención firme, pero respetuosa, por una entrega tardía.',fb:'Señalar áreas de oportunidad con firmeza, sin gritos ni humillaciones, no es violencia laboral.'},
+ {t:'Pedirle quedarse un viernes por una emergencia en el parque eólico, algo ocasional.',fb:'Encomendar tareas ocasionales distintas de las habituales ante una emergencia justificada no es, por sí mismo, violencia.'},
+ {t:'Saludarla de beso una vez, cuando ella respondió de la misma forma con naturalidad.',fb:'El contacto físico consentido no es violencia por sí mismo; deja de serlo si la persona expresó que no lo desea y se repite.'}]},
+
+{ph:1,title:'El citatorio',
+ narr:'Una semana después recibes por escrito un citatorio del Comité: se presentó una denuncia en tu contra por hostigamiento sexual y violencia laboral. Indica los hechos que se te atribuyen y la fecha y hora para comparecer.',
+ who:'Tú',alt:1,say:'Esto es grave. ¿Quién habrá sido? Voy a hablar con Ana para aclararlo.',
+ q:'¿Qué haces?',src:'Protocolo VE-5-PR-04 · 9.5 Derechos de las partes y 9.6 paso 4; Política VE-5-PO-04 · 5.2 Conductas prohibidas',
+ opts:[
+ {t:'Lees los hechos que se te atribuyen, preparas tu versión y tus pruebas, te presentas el día indicado, guardas confidencialidad y no te acercas a Ana ni indagas con otras personas.',ok:1,fb:'Tienes derecho a conocer los hechos, ser escuchado y ofrecer pruebas. La confidencialidad protege a todas las partes y está prohibida cualquier represalia.'},
+ {t:'Hablas con Ana para aclarar el malentendido antes de la cita, para ahorrarle trámites.',fb:'Contactar a la presunta víctima puede ser presión o represalia, y vulnera la confidencialidad.'},
+ {t:'No te presentas hasta que el Comité te diga quién denunció, para decidir si vale la pena participar.',fb:'Tienes derecho a ser escuchado, pero debes comparecer: el Comité ya te informó los hechos atribuidos.'},
+ {t:'Reúnes cartas de apoyo de tu equipo para entregarlas al Comité.',fb:'Pedir respaldo a tu equipo presiona a posibles testigos y rompe la confidencialidad.'}]},
+
+{ph:1,title:'Evidencia y equipos de trabajo',
+ narr:'El Comité pide conservar los mensajes del chat de trabajo y RH informa que se revisará el equipo corporativo que usas. Tu laptop guarda conversaciones con Ana.',
+ who:'Tú',alt:1,say:'Esos mensajes son míos. Si los borro, nadie se entera. Y esa laptop es casi personal.',
+ q:'¿Qué haces?',src:'Reglamento VE-3-PO-01 · art. 46 inciso n y art. 27 inciso BB; Código de Ética · 5.6 Privacidad y 7.5',
+ opts:[
+ {t:'Conservas los mensajes sin alterarlos, permites la revisión del equipo corporativo y aportas tus propias pruebas por el canal del Comité.',ok:1,fb:'La empresa puede revisar las herramientas que proporciona, y esto no se considera interferencia en comunicaciones privadas. Alterar o eliminar información dificulta la investigación.'},
+ {t:'Borras los mensajes más comprometedores y entregas el resto, para no perjudicarte.',fb:'Eliminar o alterar información es una conducta prohibida (RIT art. 27, BB) y perjudica tu propia defensa.'},
+ {t:'Te niegas a la revisión porque el equipo contiene información privada y tienes derecho a la intimidad.',fb:'Los trabajadores deben permitir las revisiones de los equipos corporativos (RIT art. 46, n; Código 5.6).'},
+ {t:'Entregas el equipo, pero antes cambias contraseñas y cuentas para proteger tu información.',fb:'Interferir u obstaculizar revisiones de equipos y cuentas corporativas es una conducta prohibida.'}]},
+
+{ph:2,title:'Medidas de protección',
+ narr:'El Comité dicta, sin prejuzgar, medidas de protección: prohibición de contacto con Ana por cualquier medio y cambio temporal de tu horario.',
+ who:'Tú',alt:1,say:'Esto es un castigo antes de tiempo.',
+ q:'¿Cómo respondes?',src:'Protocolo VE-5-PR-04 · 9.4 Medidas de protección',
+ opts:[
+ {t:'Las cumples: no son una sanción ni implican que ya se te considere responsable; incumplirlas, aun con buena intención, empeora tu situación.',ok:1,fb:'Las medidas de protección son inmediatas y temporales, y se dictan sin prejuzgar sobre la veracidad de los hechos.'},
+ {t:'Cumples el cambio de horario, pero sigues contactando a Ana por trabajo para no afectar el proyecto.',fb:'La prohibición abarca cualquier medio; los asuntos de trabajo se canalizan por las vías que defina el Comité.'},
+ {t:'Las impugnas contándole a tu equipo que te están tratando injustamente, para que lo sepan.',fb:'Difundir el caso rompe la confidencialidad y puede considerarse una represalia.'},
+ {t:'Pides que sea Ana quien cambie de área, porque ella es quien denunció.',fb:'Solo se reubica a la presunta víctima si ella lo solicita; la medida recae en la persona señalada.'}]},
+
+{ph:2,title:'Decisiones sobre Ana',
+ narr:'Mientras tanto, debes asignar proyectos y hacer la evaluación semestral de tu equipo, que incluye a Ana.',
+ who:'Tú',alt:1,say:'Quizá convenga sacar a Ana del proyecto principal. Es por la carga de trabajo, no por la denuncia.',
+ q:'¿Qué haces?',src:'Protocolo VE-5-PR-04 · 9.4 (represalias indirectas) y 6 Prohibición de represalias; Política VE-5-PO-04 · 5.2',
+ opts:[
+ {t:'No decides por tu cuenta sobre sus proyectos, reuniones ni evaluación: lo consultas con RH y con el Comité para que quede documentado y se evite cualquier apariencia de represalia.',ok:1,fb:'Los cambios de funciones, la exclusión de reuniones y las evaluaciones desfavorables sin justificación son formas de represalia indirecta que el Comité vigila.'},
+ {t:'La retiras del proyecto con una justificación de carga de trabajo bien documentada.',fb:'Aunque esté justificado, un cambio de funciones tras la denuncia puede ser una represalia indirecta si no lo revisa el Comité.'},
+ {t:'Dejas de convocarla a las reuniones para evitar roces, ya que tienes prohibido el contacto.',fb:'Excluirla de reuniones es una forma indirecta de represalia; el cumplimiento de la prohibición se resuelve por las vías que defina el Comité.'},
+ {t:'Calificas su evaluación con rigor extra para que nadie piense que la favoreces.',fb:'Una evaluación desfavorable sin justificación es una represalia indirecta.'}]},
+
+{ph:3,title:'Tu declaración',
+ narr:'Llega el día de tu entrevista. Un integrante del Comité lee los avisos previos: confidencialidad, prohibición de represalias, derecho a defenderte, presunción de inocencia y que no habrá careo con Ana.',
+ who:'Integrante del Comité',alt:1,say:'Puedes narrar los hechos con tus palabras y ofrecer las pruebas que consideres. ¿Cómo quieres proceder?',
+ q:'¿Cómo conduces tu declaración?',src:'Acta VE-5-F-36 · Avisos previos; Protocolo VE-5-PR-04 · 9.5 y 9.6 paso 4',
+ opts:[
+ {t:'Narras con honestidad qué ocurrió, cuándo y dónde, ofreces tus pruebas, pides que se asiente fielmente, firmas solo si estás conforme y solicitas tu copia.',ok:1,fb:'Tienes derecho a ser escuchado, ofrecer pruebas y recibir copia de tu declaración. Colaborar con la investigación es una obligación de todo el personal.'},
+ {t:'Pides un careo con Ana para que se sepa quién dice la verdad.',fb:'No hay careo ni confrontación entre las partes.'},
+ {t:'Cuestionas la credibilidad de Ana: dices que se viste de forma llamativa y que siempre ha sido coqueta.',fb:'Atacar la vestimenta o la vida personal se basa en estereotipos y no desvirtúa los hechos; el Comité valora con perspectiva de género.'},
+ {t:'Te niegas a declarar y envías después un escrito general, para no complicar tu defensa.',fb:'Tu defensa se ejerce en el procedimiento: el Comité te cita para escucharte y recabar tus pruebas.'}]},
+
+{ph:3,title:'Testigos',
+ narr:'El Comité cita a testigos, con su consentimiento. Luis, de tu equipo, fue citado.',
+ who:'Tú',alt:1,say:'Luis es mi mano derecha. Debería recordar la junta como yo.',
+ q:'¿Qué haces?',src:'Protocolo VE-5-PR-04 · 9.6 paso 5 y 6 Prohibición de represalias',
+ opts:[
+ {t:'No hablas con Luis del caso: su participación es voluntaria y sin coacción, y puedes proponer a tus propios testigos por el canal del Comité.',ok:1,fb:'Los testigos declaran con su consentimiento y sin coacción. Tú puedes ofrecer testigos, pero por el canal del Comité.'},
+ {t:'Le pides a Luis, como favor personal, que recuerde la junta tal como la viviste tú.',fb:'Inducir el contenido de un testimonio es coacción y afecta la validez de la investigación.'},
+ {t:'Le comentas a Luis que la evaluación del equipo se acerca y que valoras mucho su lealtad.',fb:'Insinuar consecuencias en su evaluación presiona al testigo y puede ser una represalia.'},
+ {t:'Le indicas que no asista, porque el procedimiento es voluntario para testigos.',fb:'Aunque su participación es voluntaria, impedirla obstaculiza la investigación.'}]},
+
+{ph:3,title:'Confidencialidad',
+ narr:'Mientras sigue la investigación, tu equipo nota tensión. Un compañero te pregunta en el comedor qué pasa.',
+ who:'Compañero',alt:1,say:'Se dice que hay una denuncia contra ti. ¿Es cierto? Cuéntame tu versión, quiero apoyarte.',
+ q:'¿Cómo respondes?',src:'Protocolo VE-5-PR-04 · 6 Confidencialidad y 9.5 Derechos de las partes; Código de Ética · 5.6 y 7.6',
+ opts:[
+ {t:'Le agradeces el apoyo, pero no hablas del caso: la confidencialidad protege a todas las personas y tu versión la darás ante el Comité.',ok:1,fb:'Se prohíbe difundir cualquier información del procedimiento, incluida la que permita identificar a las personas involucradas.'},
+ {t:'Le cuentas tu versión con detalle, sin nombres, para que entienda que no hiciste nada grave.',fb:'Aun sin nombres, difundir información del procedimiento está prohibido.'},
+ {t:'Le confirmas la denuncia y le pides que corrija los rumores diciendo que es una exageración de Ana.',fb:'Confirmar el caso y descalificar a la presunta víctima vulnera la confidencialidad y puede considerarse represalia.'},
+ {t:'Convocas una junta de equipo para aclarar que todo es un malentendido.',fb:'Hablar del caso con el equipo rompe la confidencialidad y puede presionar a posibles testigos.'}]},
+
+{ph:4,title:'El dictamen y tu audiencia',
+ narr:'El Comité resuelve que la conducta quedó acreditada con base en mensajes, cronología, testigos y el testimonio de Ana, y propone una medida. RH te cita a audiencia.',
+ who:'Tú',alt:1,say:'No hubo grabación ni nadie escuchó el comentario. No pueden acreditarlo así.',
+ q:'¿Qué haces?',src:'Protocolo VE-5-PR-04 · 9.2 Pruebas y 9.6 paso 7; Reglamento VE-3-PO-01 · art. 48 (procedimiento)',
+ opts:[
+ {t:'Acudes a la audiencia ante RH, expones tus argumentos y pruebas con respeto, y entiendes que los hechos pueden acreditarse por indicios.',ok:1,fb:'RH notifica por escrito, te escucha en audiencia y resuelve por acta. Puedes presentar lo que a tu derecho convenga, sin atacar a la presunta víctima.'},
+ {t:'Exiges anular el dictamen por falta de grabación o de testigos directos del comentario.',fb:'No se exige prueba directa: los hechos pueden acreditarse con indicios suficientes y con perspectiva de género.'},
+ {t:'Argumentas que Ana nunca te dijo que no, por lo que había consentimiento.',fb:'El silencio o la falta de oposición no equivalen a consentimiento, y menos aún con subordinación.'},
+ {t:'Recuerdas a RH tu antigüedad y tus resultados en la empresa para que lo tomen en cuenta.',fb:'La categoría, el puesto o el nivel jerárquico no justifica dejar de investigar ni cambia el resultado del análisis.'}]},
+
+{ph:4,title:'La sanción',
+ narr:'Quieres evitar lo peor y propones una disculpa y un acuerdo.',
+ who:'Tú',alt:1,say:'Prefiero disculparme y que Ana acepte un acuerdo. Así todo se arregla.',
+ q:'¿Qué puedes esperar del procedimiento?',src:'Protocolo VE-5-PR-04 · 10.1 Acuerdo reparatorio y 10.2 Sanciones; Reglamento VE-3-PO-01 · art. 48',
+ opts:[
+ {t:'En conductas sexuales no procede el acuerdo reparatorio ni se obliga a Ana a conciliar; la violencia y el hostigamiento son faltas muy graves, y RH aplica la medida por el procedimiento del art. 48, que puede incluir la rescisión.',ok:1,fb:'RH notifica por escrito, te escucha y resuelve por acta administrativa dentro de 30 días hábiles tras la audiencia. La rescisión solo procede si se actualiza una causa legal.'},
+ {t:'Si Ana acepta libremente tu disculpa, se firma un acuerdo reparatorio y se archiva sin sanción.',fb:'El acuerdo reparatorio no procede en conductas sexuales o físicas.'},
+ {t:'Será, como máximo, una amonestación verbal, porque es tu primera falta.',fb:'La amonestación se sustituyó: las medidas son limitación de promociones, suspensión hasta 8 días o rescisión, según la gravedad.'},
+ {t:'Mientras RH resuelve, las medidas de protección se levantan, porque ya hay dictamen.',fb:'Las medidas de protección pueden mantenerse en cualquier etapa; el seguimiento continúa después de la resolución.'}]},
+
+{ph:5,title:'Cumplir las medidas',
+ narr:'Se te notifica la resolución por escrito. Incluye medidas de no repetición: cambio permanente de horario a petición de Ana, capacitación y seguimiento.',
+ who:'Tú',alt:1,say:'Ya pasó lo peor. Lo del cambio de horario me parece exagerado.',
+ q:'¿Qué haces?',src:'Protocolo VE-5-PR-04 · 10.2 y 10.4 Reparación; Reglamento VE-3-PO-01 · art. 46 inciso j y art. 48 (reincidencia)',
+ opts:[
+ {t:'Cumples cada medida, asistes a la capacitación obligatoria y recuerdas que reincidir en 12 meses puede reclasificar la falta a un grado superior.',ok:1,fb:'La asistencia a la capacitación es obligatoria y la reincidencia dentro de 12 meses puede reclasificar la falta; no es automática ni implica por sí misma rescisión.'},
+ {t:'Cumples las medidas por un tiempo y luego las ajustas por tu cuenta cuando el ambiente se calme.',fb:'Las medidas se mantienen hasta que el Comité determine otra cosa; ajustarlas por tu cuenta es incumplirlas.'},
+ {t:'Asistes a la capacitación solo si no choca con tus pendientes, pues ya fuiste sancionado.',fb:'Asistir a los cursos de capacitación es una obligación del personal (RIT art. 46, j).'},
+ {t:'Pides revertir el cambio de horario argumentando que ya cumpliste tu sanción.',fb:'Las medidas de no repetición solicitadas por la víctima son parte de su reparación y no se revierten por haber cumplido la sanción.'}]},
+
+{ph:5,title:'Liderar después del caso',
+ narr:'Un mes después, coincides con Ana en el evento de fin de trimestre. El Comité verificará a 1, 3 y 6 meses que no haya represalias. También recibes la capacitación para mandos.',
+ who:'Tú',alt:1,say:'¿Y si me acerco a disculparme en privado? Quedaría más tranquilo.',
+ q:'¿Qué haces?',src:'Protocolo VE-5-PR-04 · 9.4, 7.3 Capacitación para mandos y 12 Roles; Política VE-5-PO-04 · 5.6',
+ opts:[
+ {t:'No te acercas con ese fin y mantienes un trato respetuoso y profesional según las medidas; como jefe, canalizas al Comité cualquier situación de tu equipo, sin investigar por tu cuenta.',ok:1,fb:'Los mandos deben prevenir, detectar y canalizar al Comité, sin investigar por cuenta propia ni tomar represalias. Una disculpa solo procede dentro del procedimiento y si la víctima la acepta.'},
+ {t:'Te acercas a disculparte en privado, porque ella tiene derecho a escuchar una disculpa sincera.',fb:'El contacto directo vulnera las medidas; una disculpa solo se da en el marco del procedimiento y si la víctima lo acepta.'},
+ {t:'Evitas saludarla y la dejas fuera de actividades del equipo, para no generar roces ni sospechas.',fb:'Excluirla es una forma de represalia indirecta; se espera un trato respetuoso y profesional.'},
+ {t:'Averiguas por tu cuenta quién del equipo habló con el Comité, para saber con quién cuentas.',fb:'Investigar por cuenta propia o tomar represalias contra testigos está prohibido.'}]}
+ ]},
+codigo:{
+ name:'Código de Ética',
+ tag:'Módulo: Código de Ética',
+ start:'Comenzar el módulo del Código de Ética',
+ phases:['Cultura','Anticorrupción','Conflictos','Terceros','Información','Denuncia'],
+ intro:'Eres una persona colaboradora de Vive Energía. Durante un día de trabajo enfrentas dilemas cotidianos regulados por el Código de Ética.',
+ scenes:[
+{ph:0,title:'Una condición insegura en el parque eólico',
+ narr:'Eres una persona colaboradora de Vive Energía y supervisas un mantenimiento en el parque eólico. Un técnico de un proveedor va a subir a una góndola sin el arnés completo para “ganar tiempo”, y el cliente presiona por terminar hoy.',
+ who:'Contratista',alt:1,say:'Son diez minutos, no pasa nada. Si paramos nos atrasamos y quedamos mal con el cliente.',
+ q:'¿Qué haces?',src:'Código de Ética · 4.1 Seguridad y salud en el trabajo',
+ opts:[
+ {t:'Detienes el trabajo y lo reportas: ninguna meta justifica poner en riesgo la integridad de las personas, y colaboradores y proveedores están obligados a detener y reportar condiciones inseguras.',ok:1,fb:'No hay acción o decisión tan importante como para poner en riesgo la vida, la salud o la integridad. Colaboradores y proveedores deben detener y reportar cualquier trabajo o condición insegura.'},
+ {t:'Dejas que continúe, pero le pides que tenga mucho cuidado para no retrasar al cliente.',fb:'Tolerar un acto inseguro por cumplir tiempos contraviene el deber de detener el trabajo.'},
+ {t:'Esperas a que termine y lo reportas después, para no interrumpir la operación.',fb:'El deber es detener y reportar en el momento; reportar después no previene el riesgo.'},
+ {t:'Le pides al proveedor firmar una carta de responsabilidad y lo dejas continuar.',fb:'Un documento no sustituye el equipo de protección ni los procedimientos de seguridad.'}]},
+
+{ph:0,title:'Contratación y derechos humanos',
+ narr:'Participas en la contratación de personal para un nuevo proyecto. Un candidato de 17 años, recomendado por un proveedor, tiene mucha experiencia.',
+ who:'Recursos Humanos',alt:1,say:'Para agilizar, contratémoslo de ayudante y quedémonos con sus documentos originales mientras dure el proyecto, por si se va.',
+ q:'¿Qué respondes?',src:'Código de Ética · 4.2 Derechos Humanos',
+ opts:[
+ {t:'Que no pueden retenerse documentos personales originales y que la edad mínima para trabajar en el proyecto es de 18 años, por lo que no puede contratarse.',ok:1,fb:'El Código fija una edad mínima de 18 años y prohíbe solicitar o retener documentación personal original en reclutamiento y contratación, incluso de proveedores y contratistas.'},
+ {t:'Aceptas retener solo copias certificadas y contratar al candidato con permiso de sus padres.',fb:'La edad mínima de 18 años no se exceptúa con el permiso de la familia.'},
+ {t:'Contratas al candidato por su experiencia, pero solo para tareas administrativas y no operativas.',fb:'La edad mínima de 18 años aplica para trabajar en el proyecto, sin importar el tipo de tarea.'},
+ {t:'Retienes los originales solo de la persona contratada y se los devuelves al terminar el proyecto, con recibo firmado.',fb:'Retener documentos personales originales está expresamente prohibido, aunque se entregue un recibo.'}]},
+
+{ph:1,title:'Un pago para agilizar un permiso',
+ narr:'Un certificado de rutina para el proyecto está atorado en una oficina de gobierno. Un empleado de ventanilla insinúa que con “un detalle” saldría hoy.',
+ who:'Ventanilla',alt:1,say:'Con un detalle de 500 pesos se lo saco hoy mismo. Aquí así se hace.',
+ q:'¿Qué haces?',src:'Código de Ética · 5.2 Anticorrupción y 5.4 Pagos de facilitación',
+ opts:[
+ {t:'Rechazas el pago, lo informas a tu superior y sigues el trámite por la vía oficial.',ok:1,fb:'Los pagos de facilitación son pagos de baja cuantía, no oficiales e impropios a funcionarios de bajo nivel para agilizar un trámite de rutina; son una forma de corrupción y están prohibidos.'},
+ {t:'Pagas, porque es una cantidad mínima y solo agiliza un trámite al que la empresa ya tiene derecho.',fb:'La baja cuantía y el derecho al trámite no vuelven lícito el pago.'},
+ {t:'Pagas de tu bolsillo para que la empresa no quede involucrada, y no lo reportas.',fb:'Sigue siendo una conducta de corrupción ligada a las actividades de la empresa, y omitir su reporte agrava la situación.'},
+ {t:'Pagas y lo registras como “gastos de gestión” en tu reporte de gastos.',fb:'Además de ser corrupción, registrar un gasto con un concepto falso es presentar cuentas ficticias, otra conducta prohibida.'}]},
+
+{ph:1,title:'Regalos a un servidor público',
+ narr:'Se acerca la entrega de un proyecto. Un director de área quiere agradecer a un funcionario que dio seguimiento a los permisos con una canasta y vinos por 2,500 pesos.',
+ who:'Director de área',alt:1,say:'Es un gesto de cortesía, nada comprometedor. Se lo entregamos esta semana.',
+ q:'¿Qué corresponde según el Código?',src:'Código de Ética · 5.2 Anticorrupción (Regalos y entretenimiento)',
+ opts:[
+ {t:'No entregarlo así: las cortesías a servidores públicos requieren autorización previa de la Comisión del Consejo, por regla general no pasan de 1,000 pesos, nunca son en efectivo y se documentan.',ok:1,fb:'Las cortesías deben ser ocasionales, usuales y sin intención de trato preferencial; por regla general no sobrepasan $1,000, solo gerentes o directores pueden solicitarlas y requieren autorización previa.'},
+ {t:'Entregarlo si el propio director lo autoriza por escrito, porque es la persona facultada para decidirlo.',fb:'La autorización no la da el director del área: se revisa en la Dirección de Administración y Finanzas y la aprueba la Comisión delegada del Consejo de Administración.'},
+ {t:'Dividir el obsequio en dos entregas de 1,250 pesos para que cada una parezca una atención menor.',fb:'Fraccionar el obsequio para esquivar el límite busca eludir la regla y puede interpretarse como un intento de obtener trato preferencial.'},
+ {t:'Cambiarlo por una tarjeta de regalo de 1,000 pesos, que es más práctica.',fb:'Nunca serán cantidades de dinero en efectivo ni por cualquier otro medio; una tarjeta de regalo equivale a dinero.'}]},
+
+{ph:1,title:'El gestor que promete resultados',
+ narr:'Un gestor contratado para tramitar una autorización te pide un anticipo “para gastos extras” sin factura, y asegura que él se encargará de “acomodar” el expediente con gente de la dependencia.',
+ who:'Gestor',alt:1,say:'No pregunte detalles. Usted autorice el anticipo y yo me encargo de que salga sin problemas.',
+ q:'¿Qué haces?',src:'Código de Ética · 5.2 Anticorrupción y 5.3 Actuación de los terceros',
+ opts:[
+ {t:'No autorizas el anticipo, detienes el trámite con ese tercero y lo reportas: la corrupción está prohibida también cuando se realiza mediante un tercero.',ok:1,fb:'Las conductas de corrupción están prohibidas en cualquier relación, directa o mediante un tercero. Vive Energía verifica que los terceros cumplan las leyes y el Código.'},
+ {t:'Autorizas un anticipo menor y le pides que firme el compromiso de actuar conforme a la ley.',fb:'Un compromiso firmado no corrige un pago sin sustento ni la sospecha de un beneficio indebido.'},
+ {t:'Aceptas sin preguntar detalles, para que la responsabilidad sea solo del gestor.',fb:'No saber no te exime: la prohibición alcanza a quien promueve o permite conductas de corrupción mediante terceros.'},
+ {t:'Le pagas al terminar, contra una factura por “honorarios”, para que todo quede registrado.',fb:'Una factura no legitima un pago destinado a un beneficio indebido; ocultaría la naturaleza real del gasto.'}]},
+
+{ph:2,title:'Una relación que debe declararse',
+ narr:'Llevas unos meses en una relación sentimental con una persona de otra dirección. Se abre una vacante en tu equipo y esa persona quiere postularse.',
+ who:'Tú',alt:1,say:'Es mi vida privada; nadie tiene por qué saberlo.',
+ q:'¿Qué haces?',src:'Código de Ética · 5.2 (prohibiciones 4 y 5); Reglamento VE-3-PO-01 · art. 27, inciso V',
+ opts:[
+ {t:'Lo declaras a tu jefe inmediato (o al director del área si tu jefe está involucrado) y la persona que se postula también lo declara al inicio del proceso de contratación.',ok:1,fb:'Las relaciones sentimentales y los vínculos de parentesco deben declararse previamente, al inicio de la contratación, sin importar cargo, área o dirección.'},
+ {t:'Esperas a que la persona sea contratada y entonces se lo comentas a tu jefe.',fb:'Debe declararse previamente, al inicio del proceso de contratación, no después.'},
+ {t:'No dices nada: como son de áreas distintas no existe conflicto.',fb:'Ocultar relaciones sentimentales entre colaboradores está prohibido, sin importar cargo, área o dirección.'},
+ {t:'Lo comentas solo de manera informal con Recursos Humanos, sin avisar a tu jefe.',fb:'Debe revelarse al jefe inmediato o, si él está involucrado, al director del área.'}]},
+
+{ph:2,title:'Una actividad externa',
+ narr:'Un amigo te ofrece ser socio de una empresa de mantenimiento que podría ser proveedora de Vive Energía. Te propone no figurar en el acta constitutiva.',
+ who:'Amigo',alt:1,say:'Sigues en tu puesto como siempre. Solo serías socio “en lo oscurito”; nadie se entera.',
+ q:'¿Qué haces?',src:'Código de Ética · 5.2 (prohibiciones 1 a 3) y 7.7 Conductas esperadas',
+ opts:[
+ {t:'Rechazas participar y, si surge la relación comercial, declaras el conflicto de interés: no debes tener negocios que interfieran con tus deberes ni ocultar un conflicto.',ok:1,fb:'Están prohibidos los intereses particulares y las actividades externas que interfieran con los de la empresa, así como ocultar la existencia de un conflicto de interés.'},
+ {t:'Aceptas, pero te abstienes de intervenir en la contratación de esa empresa cuando se presente.',fb:'Abstenerte no basta: ser socio de un posible proveedor ya genera un conflicto que debe declararse.'},
+ {t:'Aceptas si la empresa ofrece precios competitivos, porque eso beneficia a Vive Energía.',fb:'Un buen precio no elimina el conflicto de interés ni la obligación de declararlo.'},
+ {t:'Aceptas poniendo tu participación a nombre de un familiar para evitar problemas.',fb:'Interponer a un tercero para ocultar el interés es ocultar el conflicto y usar influencias para beneficio propio.'}]},
+
+{ph:3,title:'Selección de un proveedor',
+ narr:'Debes elegir a un proveedor de equipo para un proyecto. Un amigo tuyo ofrece un precio apenas mayor; otra empresa que no conoces ofrece mejor precio, calidad y experiencia comprobada.',
+ who:'Tú',alt:1,say:'Con mi amigo hay confianza. La otra empresa no sé cómo trabaja.',
+ q:'¿Cómo decides?',src:'Código de Ética · 6.3 Proveedores y 5.2 (conflicto de interés)',
+ opts:[
+ {t:'Aplicas los criterios del Código (precio competitivo, calidad, experiencia, servicio y prácticas sostenibles), das igualdad de oportunidades a todos y declaras tu vínculo con el amigo.',ok:1,fb:'La selección se basa en criterios objetivos y con igualdad de oportunidades. Si hay un vínculo personal, se declara para evitar influencias indebidas.'},
+ {t:'Eliges a tu amigo, porque la confianza personal reduce el riesgo del proyecto.',fb:'Usar influencias para favorecer a amigos está prohibido y rompe la igualdad de oportunidades.'},
+ {t:'Eliges a tu amigo, pero lo declaras y negocias un descuento para igualar el precio.',fb:'Con un vínculo personal debes declararlo y abstenerte; la decisión debe tomarla quien no tenga conflicto.'},
+ {t:'Cierras de palabra con la otra empresa para acelerar y firmas el contrato después.',fb:'La relación comercial con proveedores debe ser formal y los acuerdos siempre por escrito.'}]},
+
+{ph:3,title:'Un acuerdo entre competidores',
+ narr:'En un concurso privado para un proyecto, el representante de otra empresa se acerca contigo en un evento.',
+ who:'Competidor',alt:1,say:'Alternemos las ofertas más bajas para que a todos nos toque ganar y mantener buenos márgenes. Nadie sale perjudicado.',
+ q:'¿Qué haces?',src:'Código de Ética · 5.2 Anticorrupción (Competencia leal) y 7.7 Conductas esperadas',
+ opts:[
+ {t:'Rechazas la propuesta y lo reportas a tu superior: Vive Energía rechaza acuerdos con otras empresas en detrimento de los clientes.',ok:1,fb:'Se promueve la libre concurrencia y se rechaza cualquier acuerdo con otras empresas en detrimento de los clientes; apoyar la competencia desleal está prohibido, y toda irregularidad debe comunicarse.'},
+ {t:'Respondes que no te interesa, pero no lo reportas porque no hubo ningún acuerdo.',fb:'Debes comunicar oportunamente a tu superior cualquier hecho o irregularidad, aunque no llegue a concretarse.'},
+ {t:'Aceptas solo por esta vez, para mantener la relación con un actor importante del mercado.',fb:'Está prohibido apoyar cualquier actividad que represente competencia desleal, aunque sea una sola vez.'},
+ {t:'Aceptas siempre que no quede por escrito, para evitar riesgos.',fb:'Que no conste por escrito no lo vuelve lícito y busca ocultar el acuerdo.'}]},
+
+{ph:4,title:'Información, contraseñas y USB',
+ narr:'Un compañero se va de vacaciones y te pide tus claves del sistema de proyectos. También quiere que le copies la lista de proveedores en su USB para trabajar desde casa.',
+ who:'Mario (compañero)',alt:1,say:'Pásame tu usuario y contraseña mientras no estás, y copia esos archivos en mi USB. Es solo para avanzar.',
+ q:'¿Qué haces?',src:'Código de Ética · 5.6 Privacidad y confidencialidad y 7.7 Conductas prohibidas',
+ opts:[
+ {t:'No compartes tu usuario ni tu contraseña ni copias información a dispositivos personales; le sugieres solicitar el acceso autorizado al responsable de la información.',ok:1,fb:'Facilitar códigos de usuario y contraseñas y sustraer información en una USB están prohibidos. Toda la información es propiedad de la empresa y debe tratarse según su clasificación.'},
+ {t:'Compartes tu contraseña y la cambias cuando regreses, para que no quede riesgo.',fb:'Facilitar códigos de usuario y contraseñas a compañeros es una conducta prohibida; eres responsable de las claves que se te asignan.'},
+ {t:'Copias solo la lista de proveedores, porque no contiene datos personales.',fb:'Sustraer información de la empresa en medios electrónicos para uso personal, sin autorización del responsable, está prohibido.'},
+ {t:'Le envías los archivos a su correo personal para no usar USB, que es más seguro.',fb:'Enviar información de la empresa a medios personales sin autorización del responsable también está prohibido.'}]},
+
+{ph:4,title:'Redes sociales y la marca',
+ narr:'Terminó una instalación importante en el parque eólico. Con entusiasmo, quieres publicar en tus redes fotos del proyecto con el logotipo de Vive Energía, el nombre del cliente y la capacidad instalada.',
+ who:'Tú',alt:1,say:'Es una buena noticia para la empresa. Seguro les va a gustar.',
+ q:'¿Qué haces?',src:'Código de Ética · 5.8 Comunicación, Imagen institucional y 5.7 Propiedad intelectual',
+ opts:[
+ {t:'No publicas el logotipo, la marca ni los detalles del proyecto: la comunicación corresponde al área institucional; a título personal solo podrías opinar aclarándolo expresamente.',ok:1,fb:'Ningún colaborador puede usar la imagen o marcas de Vive Energía ni dar a conocer proyectos en redes sin autorización. Usar la marca exige autorización escrita de la Dirección General.'},
+ {t:'Publicas con el logotipo y agregas la frase “opiniones a título personal”, para cubrir el aviso.',fb:'El aviso de título personal no autoriza usar el logotipo ni revelar proyectos de la empresa.'},
+ {t:'Publicas solo las fotos del equipo, sin logotipo, pero mencionas el nombre del cliente y la capacidad instalada.',fb:'Dar a conocer proyectos o actividades de la empresa sin autorización también está prohibido.'},
+ {t:'Publicas desde una cuenta privada con pocos seguidores, porque no tendrá impacto.',fb:'La restricción no depende del alcance de la cuenta.'}]},
+
+{ph:5,title:'Algo indebido en un reporte de gastos',
+ narr:'Notas que un compañero con mucha antigüedad, y además tu amigo, registra comidas que no ocurrieron en su reporte de viáticos.',
+ who:'Tú',alt:1,say:'Es mi amigo y llevamos años aquí. No quiero meterlo en problemas.',
+ q:'¿Qué haces?',src:'Código de Ética · 7.6 Canal de denuncia y 7.7 Conductas esperadas',
+ opts:[
+ {t:'Lo reportas por los canales del Código (buzón de quejas, denuncias@viveenergia.com o tu jefe inmediato): hay confidencialidad, también se atienden quejas anónimas y está prohibida cualquier represalia.',ok:1,fb:'Es deber de cada colaborador denunciar las violaciones y comunicar toda irregularidad. Se asegura la confidencialidad, se respetan las quejas anónimas y se prohíben las represalias.'},
+ {t:'Hablas con él para que lo corrija y, si lo hace, no reportas nada.',fb:'Presentar cuentas de gastos ficticias es una conducta prohibida y debe comunicarse oportunamente.'},
+ {t:'No dices nada: no es tu responsabilidad vigilar a tus compañeros.',fb:'Es deber de cada colaborador conocer, comunicar y cumplir las reglas, así como denunciar cualquier violación.'},
+ {t:'Lo comentas con otros compañeros para confirmar si también lo han notado, antes de reportar.',fb:'Difundirlo sin pasar por el canal formal rompe la confidencialidad y puede dañar injustamente a las personas.'}]},
+
+{ph:5,title:'Nadie está por encima del Código',
+ narr:'Ana te cuenta que un director le hace comentarios sexuales y le grita en público. Teme denunciar porque “es director y a él nadie lo toca”.',
+ who:'Ana',say:'¿De verdad el Código aplica también para un director?',
+ q:'¿Qué le respondes?',src:'Código de Ética · 2 Mensaje del Consejo, 4.2, 7.1 y 7.6; Protocolo VE-5-PR-04',
+ opts:[
+ {t:'Que ningún colaborador está por encima del Código: puede denunciar por los canales con confidencialidad y sin represalias, y el caso se atiende con el Protocolo VE-5-PR-04 sin importar el cargo.',ok:1,fb:'El Código aplica a todos por igual, independientemente del nivel jerárquico, y se da seguimiento a cualquier conducta sin distinción por el cargo. La violencia laboral se atiende con el Protocolo.'},
+ {t:'Que mejor espere a que ese director cambie de puesto, porque con los directivos el procedimiento es distinto.',fb:'No hay un procedimiento distinto: el nivel jerárquico no justifica dejar de investigar.'},
+ {t:'Que lo hable primero con él, por respeto a su cargo, para darle oportunidad de corregirse.',fb:'No se obliga a la persona afectada a confrontar a quien tiene poder sobre ella; existen canales formales.'},
+ {t:'Que lo cuente en el equipo para que se sepa y se genere presión sobre el director.',fb:'Difundirlo viola la confidencialidad y puede perjudicar el procedimiento y a las personas involucradas.'}]}
+ ]}
+
+};
+
+
+/* ===== Aerojandro ===== */
+const MAJI=[
+{q:'¿Qué es la política de cero tolerancia?',a:`<b>Vive Energía no tolera la violencia laboral</b> en ninguna de sus formas: acoso laboral, hostigamiento y acoso sexual. Aplica a todo el personal sin importar su nivel y se extiende a contratistas, proveedores y demás integrantes de la cadena de valor, en el centro de trabajo, traslados, eventos, viajes y medios digitales.<br>Entre sus compromisos: capacitar cada año con perspectiva de género, atender toda denuncia sin importar la categoría o el contrato, prohibir las represalias y documentar cada actuación.<span class="tag">📖 Política VE-5-PO-04 · Alcance y 5.3 Compromisos</span>`},
+{q:'¿Qué es violencia laboral, acoso y hostigamiento?',a:`La <b>violencia laboral</b> es un acto u omisión, en abuso de poder, que daña la autoestima, salud, integridad, libertad o seguridad de una persona. Puede ser un solo evento o varios.<ul><li><b>Acoso laboral:</b> serie de eventos para intimidar, excluir o degradar.</li><li><b>Hostigamiento sexual:</b> hay subordinación real y conductas de connotación lasciva.</li><li><b>Acoso sexual:</b> sin subordinación, pero con abuso de poder que genera indefensión.</li></ul>En el hostigamiento y el acoso sexual basta un solo evento.<span class="tag">📖 Protocolo VE-5-PR-04 · Definiciones y 7.2</span>`},
+{q:'¿Qué sí y qué no es violencia laboral?',a:`<b>Sí puede serlo:</b><ul><li>Gritos, insultos, burlas o críticas humillantes en público.</li><li>Comentarios o mensajes de connotación sexual no deseados.</li><li>Contacto físico no consentido.</li><li>Mensajes insistentes fuera de horario o tareas degradantes de forma repetida.</li></ul><b>No lo es, por sí mismo:</b><ul><li>Una llamada de atención firme y respetuosa.</li><li>Una tarea distinta por una emergencia justificada.</li><li>Un saludo consentido.</li></ul>Para casos de naturaleza sexual, la Guía propone cinco criterios: jerarquía y vínculo, contenido, impacto (no intención), consentimiento y patrón. También cuentan los medios digitales.<span class="tag">📖 Guía VE-5-I-04 · 4.1, 4.3 y 4.4</span>`},
+{q:'¿Qué es el consentimiento?',a:`Debe ser <b>libre, expreso, específico y revocable</b>. No hay consentimiento cuando existe presión, coerción o subordinación que lo inhiba. El silencio, la falta de oposición o haber aceptado algo antes <b>no</b> equivalen a consentimiento.<span class="tag">📖 Protocolo VE-5-PR-04 · Definiciones; Guía VE-5-I-04 · 4.4 y 4.5</span>`},
+{q:'¿Cómo presento una denuncia?',a:`<ul><li><b>Por escrito:</b> formato VE-5-F-34 o escrito libre con nombre y firma, a la Secretaría Ejecutiva, a una persona consejera o a cualquier integrante del Comité, o escaneado a <b>denuncias@viveenergia.com</b>.</li><li><b>Verbal o telefónica:</b> 99 9219 7812 o 55 8554 7868; se documenta en el F-34 y debe ratificarse por escrito.</li><li><b>Buzones de quejas</b> en las oficinas de Mérida y de la Ciudad de México.</li><li><b>Anónima:</b> se registra y permite al Comité actuar de oficio, pero no inicia un procedimiento formal.</li><li>Si la presenta un tercero, la presunta víctima la ratifica en 10 días hábiles.</li></ul>También puedes acudir a vías externas (PROFEDET, centros de conciliación, fiscalías, CONAPRED) sin que el mecanismo interno lo restrinja.<span class="tag">📖 Protocolo VE-5-PR-04 · 9.1 y 11; Código de Ética · 7.6</span>`},
+{q:'¿Qué pasa después de denunciar?',a:`<ol style="margin:6px 0 2px 18px"><li>Clave única, acuse y registro en la bitácora; se evalúan medidas de protección en 24 h.</li><li>El Comité acuerda la admisión en 5 días hábiles (3 días hábiles si hay que completar datos).</li><li>Entrevistas a la presunta víctima, a la persona señalada y a testigos (acta VE-5-F-36), sin careo.</li><li>Dictamen del Comité en pleno (VE-5-F-35): la investigación no pasa de 20 días hábiles desde la admisión.</li><li>RH aplica la medida con el procedimiento del art. 48 del Reglamento (audiencia y resolución por acta en 30 días hábiles).</li><li>Notificación a las partes y seguimiento posterior al cierre.</li></ol><span class="tag">📖 Protocolo VE-5-PR-04 · 9.6; Reglamento VE-3-PO-01 · art. 48</span>`},
+{q:'¿Me protegen mientras investigan?',a:`Sí. El Comité puede dictar medidas inmediatas, sin prejuzgar: prohibición de contacto, reubicación o cambio de horario de la persona señalada, trabajo en casa temporal y acompañamiento psicológico y jurídico.<br>Las <b>represalias</b>, incluidas las indirectas (cambios de funciones, exclusión de reuniones o evaluaciones desfavorables sin justificación), están prohibidas. El Comité verifica su ausencia al mes, a los 3 y a los 6 meses.<span class="tag">📖 Protocolo VE-5-PR-04 · 9.4; Formato VE-5-F-35</span>`},
+{q:'¿Qué pasa si me señalan en una denuncia?',a:`<b>Tus derechos:</b> conocer los hechos que se te atribuyen, ser escuchado, ofrecer pruebas, presunción de inocencia, copia de tu declaración, confidencialidad y una resolución fundada.<br><b>Tus obligaciones:</b> comparecer y colaborar, respetar las medidas de protección (por ejemplo, no contactar a la otra persona), no tomar represalias, no difundir el caso y no alterar evidencia ni obstaculizar la revisión de equipos corporativos.<span class="tag">📖 Protocolo VE-5-PR-04 · 9.5; Reglamento VE-3-PO-01 · art. 27 (BB) y 46 (n)</span>`},
+{q:'¿Qué sanciones existen?',a:`El Reglamento clasifica las faltas en leves, graves y muy graves. La violencia, el hostigamiento, el acoso y la discriminación son <b>muy graves</b>.<ul><li>Limitación de promociones hasta por 6 meses.</li><li>Suspensión sin goce de sueldo hasta por 8 días, previa audiencia.</li><li>Rescisión, solo si se actualiza una causa del art. 47 de la LFT (por ejemplo, hostigamiento o acoso sexual).</li></ul>Reincidir en 12 meses puede reclasificar la falta a un grado superior. La clasificación no implica, por sí misma, rescisión.<span class="tag">📖 Reglamento VE-3-PO-01 · art. 48; Protocolo VE-5-PR-04 · 10.2</span>`},
+{q:'¿Qué es el Comité y la persona consejera?',a:`El <b>Comité de Atención y Seguimiento</b> aplica el Protocolo, investiga las denuncias y propone las resoluciones. Lo integran la Presidencia (Dirección General o a quien designe, con voto de calidad), la Secretaría Ejecutiva (RH o la persona designada) y personas consejeras, en igual número de mujeres y hombres.<br>La <b>persona consejera</b> orienta y acompaña a la presunta víctima si ella lo decide. Quien tenga un conflicto de interés debe excusarse y dejar constancia. La propuesta de rescisión requiere la aprobación de la Presidencia y la opinión de Jurídica.<span class="tag">📖 Protocolo VE-5-PR-04 · 8.0</span>`},
+{q:'¿Qué formatos y documentos existen?',a:`<ul><li><b>VE-5-F-34</b> · Formato de denuncia.</li><li><b>VE-5-F-35</b> · Seguimiento y resolución (lo llena el Comité).</li><li><b>VE-5-F-36</b> · Acta de declaración.</li><li><b>VE-5-F-37</b> · Bitácora de registro de denuncias.</li><li><b>VE-5-F-38</b> · Bitácora de prevención y capacitación.</li><li><b>VE-5-PO-04</b> Política de cero tolerancia · <b>VE-5-PR-04</b> Protocolo · <b>VE-5-I-04</b> Guía auxiliar · <b>VE-5-PO-03</b> Riesgos psicosociales.</li><li><b>VE-3-PO-03</b> Código de Ética · <b>VE-3-PO-01</b> Reglamento Interior de Trabajo.</li></ul>`},
+{q:'¿Qué capacitación es obligatoria?',a:`Todo el personal debe recibir <b>al menos una vez al año</b> capacitación con perspectiva de género sobre violencia laboral, acoso, hostigamiento, discriminación y prevención de las violencias contra las mujeres. Asistir es obligatorio.<br>Hay tres niveles: <b>todo el personal</b>, <b>mandos y supervisión</b> (liderazgo respetuoso y obligación de canalizar) y <b>Comité y personas consejeras</b> (entrevista sin revictimización, prueba con perspectiva de género). Se aplica una evaluación y RH registra todo en el VE-5-F-38.<span class="tag">📖 Protocolo VE-5-PR-04 · 7.3; Reglamento VE-3-PO-01 · art. 46 (j)</span>`},
+{q:'Tengo dudas sobre si algo es violencia',a:`Es normal dudar. Estas reglas de oro ayudan:<ul><li><b>Respeta el espacio personal.</b></li><li><b>No supongas:</b> lo normal para ti puede no serlo para otra persona.</li><li><b>Consentimiento:</b> libre, claro, consciente, específico y revocable; el silencio no lo es.</li><li><b>Comunica:</b> si algo te incomoda, dilo o consulta a una persona consejera.</li></ul>Preguntar no te compromete a denunciar.<span class="tag">📖 Guía VE-5-I-04 · 4.5 Reglas de oro</span>`},
+{q:'¿De qué trata el Código de Ética?',a:`Es la base del actuar de todas las personas de Vive Energía. Su propósito es <b>hacer lo correcto en cada paso del camino</b>. Los valores son: <b>Profesionalismo, Unión, Innovación e Integridad</b>.<br>Aplica a todo el personal, proveedores, contratistas y cualquier persona con la que la empresa se relacione. <b>Ningún colaborador está por encima del Código</b>, sin importar su nivel. Ante dudas puedes acudir a Recursos Humanos, al buzón de quejas, a denuncias@viveenergia.com o a tu jefe inmediato.<span class="tag">📖 Código de Ética · 1, 2 y 3</span>`},
+{q:'¿Qué es corrupción y qué son los pagos de facilitación?',a:`Es ofrecer, prometer, pedir, recibir o conceder un beneficio indebido para obtener una ventaja, directamente o mediante un tercero. Incluye soborno, tráfico de influencias, colusión y uso de información falsa en trámites.<br>Los <b>pagos de facilitación</b> son pagos pequeños e impropios a funcionarios de bajo nivel para agilizar un trámite de rutina (licencias, permisos, certificados). <b>También están prohibidos.</b><span class="tag">📖 Código de Ética · 5.2 y 5.4</span>`},
+{q:'¿Puedo dar o recibir regalos?',a:`<ul><li>Está prohibido dar beneficios indebidos a servidores públicos, aunque sean regalos, viajes o entretenimiento.</li><li>Las cortesías por tradición local requieren <b>autorización previa</b> de la Comisión delegada del Consejo; solo las piden gerentes y directores.</li><li>Por regla general, <b>no más de $1,000</b>, nunca en efectivo, ocasionales y sin buscar trato preferencial.</li><li>Si recibes algo de un servidor público que evidentemente supera $1,000, informa a tu superior para que obtenga autorización de la Dirección de Administración y Finanzas.</li></ul><span class="tag">📖 Código de Ética · 5.2 (Regalos y entretenimiento)</span>`},
+{q:'¿Qué es un conflicto de interés?',a:`Cuando tus intereses particulares interfieren o pretenden interferir con los de la empresa. Están prohibidos, entre otros: aceptar o pedir regalos o comisiones a cambio de favores, actividades externas que dificulten tu trabajo, y <b>contrataciones de familiares y relaciones sentimentales no declaradas</b>.<br>Estas últimas se declaran al jefe inmediato (o al director del área si el jefe está involucrado) desde el inicio del proceso. Ocultar un conflicto de interés es una conducta prohibida.<span class="tag">📖 Código de Ética · 5.2; Reglamento VE-3-PO-01 · art. 27 (V)</span>`},
+{q:'¿Cómo cuido la información y las redes sociales?',a:`<ul><li>La información de la empresa es de su propiedad: clasifícala (restringida, interna o pública) y no la compartas sin autorización.</li><li>No compartas tus contraseñas ni saques información en USB para uso personal.</li><li>No uses el logotipo ni la marca, ni hables de proyectos de la empresa en redes, sin autorización. Si opinas a título personal, dilo expresamente.</li><li>No uses lenguaje discriminatorio ni discurso de odio.</li><li>Tus datos personales están protegidos: puedes consultar el aviso de privacidad y ejercer tus derechos ARCO.</li></ul><span class="tag">📖 Código de Ética · 5.6, 5.7, 5.8 y 7.7</span>`},
+{q:'¿Cómo trato a proveedores, clientes y el mercado?',a:`<ul><li><b>Proveedores:</b> igualdad de oportunidades, relación formal y por escrito, pago oportuno; se eligen por precio competitivo, calidad, experiencia, servicio y prácticas sostenibles.</li><li><b>Clientes:</b> sin afirmaciones falsas ni compromisos que no se puedan cumplir.</li><li><b>Competencia leal:</b> no se pactan acuerdos con otras empresas en detrimento de los clientes.</li><li><b>Antilavado:</b> solo actividades lícitas; se prohíbe todo lo ligado a recursos de procedencia ilícita.</li><li><b>Registros:</b> las cuentas deben reflejar fielmente las transacciones; están prohibidos los gastos ficticios.</li></ul><span class="tag">📖 Código de Ética · 5.2, 5.5, 6.1, 6.2 y 6.3</span>`},
+{q:'¿Qué hago si veo algo indebido?',a:`Repórtalo por los canales del Código: <b>buzones de quejas</b> en Mérida y Ciudad de México o <b>denuncias@viveenergia.com</b>; también puedes avisar a tu jefe inmediato. Se garantiza la confidencialidad, se atienden también las quejas anónimas y <b>está prohibida cualquier represalia</b>.<br>El Comité de Ética orienta sobre los reportes y vigila que la investigación sea objetiva, imparcial y confidencial. Si se trata de violencia laboral, acoso u hostigamiento, aplica el Protocolo VE-5-PR-04.<span class="tag">📖 Código de Ética · 7.2, 7.6 y 7.7</span>`}
+
+];
+const majiEl={fab:document.getElementById('majiFab'),panel:document.getElementById('majiPanel'),body:document.getElementById('majiBody'),x:document.getElementById('majiX')};
+let majiStarted=false;
+const majiWait=ms=>new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion:reduce)').matches?0:ms));
+function majiScroll(el,top){
+  const b=majiEl.body,y=top&&el?Math.max(0,el.offsetTop-12):b.scrollHeight;
+  b.scrollTo({top:y,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+}
+function majiAdd(cls,html){const d=document.createElement('div');d.className='mb '+cls;d.innerHTML=html;majiEl.body.appendChild(d);return d}
+const MAJI_PROTO=13;
+function majiChips(){
+  const w=document.createElement('div');w.className='chips';
+  w.innerHTML=MAJI.map((m,i)=>(i===0?'<div class="gh">Violencia laboral y Protocolo</div>':i===MAJI_PROTO?'<div class="gh">Código de Ética</div>':'')+`<button class="chip" data-i="${i}" style="animation-delay:${Math.min(i,12)*45}ms">${m.q}</button>`).join('');
+  w.querySelectorAll('.chip').forEach(b=>b.onclick=()=>majiAsk(+b.dataset.i,w));
+  majiEl.body.appendChild(w);
+  return w;
+}
+let majiBusy=false;
+async function majiAsk(i,chips){
+  if(majiBusy)return;majiBusy=true;
+  if(chips){chips.classList.add('out');await majiWait(200);chips.remove()}
+  const me=majiAdd('me',MAJI[i].q);majiScroll(me,false);
+  await majiWait(450);
+  const t=majiAdd('bot','<div class="typing" aria-label="Aerojandro está escribiendo"><i></i><i></i><i></i></div>');
+  majiScroll(t,false);
+  await majiWait(900);
+  t.classList.add('fade');await majiWait(180);
+  t.innerHTML=MAJI[i].a;t.classList.remove('fade');t.classList.add('reveal');
+  majiScroll(t,true);
+  await majiWait(700);
+  const q=majiAdd('bot reveal','¿Quieres saber algo más?');
+  const w=majiChips();
+  majiScroll(q,false);
+  majiBusy=false;
+}
+function majiOpen(open){
+  majiEl.panel.classList.toggle('open',open);majiEl.fab.setAttribute('aria-expanded',open);
+  if(open){majiEl.fab.classList.add('seen');
+    if(!majiStarted){majiStarted=true;majiAdd('bot','¡Hola! Soy <b>Aerojandro</b>. Te oriento sobre la política de Vive Energía contra la violencia laboral, el acoso y el hostigamiento, y sobre el <b>Código de Ética</b>. <b>No recibo denuncias</b> ni sustituyo al Comité. Elige una pregunta:');majiChips()}}
+}
+function setAerojandro(show){
+  majiEl.fab.classList.toggle('show',show);
+  if(!show)majiOpen(false);
+}
+majiEl.fab.onclick=()=>majiOpen(!majiEl.panel.classList.contains('open'));
+majiEl.x.onclick=()=>{majiOpen(false);majiEl.fab.focus()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&majiEl.panel.classList.contains('open'))majiOpen(false)});
+
+const app=document.getElementById('app');
+let st;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const bolts=(n,cls)=>Array.from({length:MAXTRUST},(_,i)=>BOLT.replace('%C%',(i<n?'':'off ')+(cls||''))).join('');
+const SC=()=>ROLES[st.role].scenes;
+const PH=()=>ROLES[st.role].phases||PHASES;
+const newState=role=>({role:role,i:0,trust:MAXTRUST,log:[],left:0,t:null});
+
+function intro(){
+  st=newState(null);
+  setAerojandro(true);
+  app.innerHTML=`<section class="hero">
+  <div class="kicker">Protocolo VE-5-PR-04 · Vive Energía</div>
+  <h1>El Caso de <span>Ana</span></h1>
+  <p>Ana, una colaboradora de Operaciones, vive una situación de violencia laboral. Cada decisión que tomes afectará el resultado y la confianza en el proceso.</p>
+  <p>Puedes recorrer el caso como <b>Evaluador</b> o como <b>Evaluado</b> (etapas del Protocolo: identificar, denunciar, proteger, investigar, resolver y reparar) o practicar el <b>Código de Ética</b> de Vive Energía.</p>
+  <h2 class="pick">Elige tu recorrido</h2>
+  <div class="roles" role="radiogroup" aria-label="Elige tu recorrido">
+   <button class="role" role="radio" aria-checked="false" data-r="evaluador">
+    <span class="ico">🔎</span><b>Evaluador</b>
+    <em>Caso de Ana · Especializado</em>
+    <small>Eres persona consejera del Comité de Atención y Seguimiento. Recibes la denuncia, dictas medidas, entrevistas, dictaminas y das seguimiento.</small>
+   </button>
+   <button class="role" role="radio" aria-checked="false" data-r="evaluado">
+    <span class="ico">🙋</span><b>Evaluado</b>
+    <em>Caso de Ana · General</em>
+    <small>Eres Ricardo, la persona señalada en la denuncia. Vives el procedimiento desde tus derechos y obligaciones: cooperar, no tomar represalias y cumplir las medidas.</small>
+   </button>
+   <button class="role" role="radio" aria-checked="false" data-r="codigo">
+    <span class="ico">📘</span><b>Código de Ética</b>
+    <em>Módulo · General</em>
+    <small>Decisiones cotidianas sobre seguridad, anticorrupción, regalos, conflictos de interés, proveedores, información y redes sociales.</small>
+   </button>
+  </div>
+  <div class="rules">
+   <div class="rule"><span class="ico">⚡</span><b>3 puntos de confianza</b><small>Debes mantenerlos a lo largo del proceso.</small></div>
+   <div class="rule"><span class="ico">⏱️</span><b>60 segundos</b><small>Por cada decisión. Una respuesta tardía cuesta un punto.</small></div>
+   <div class="rule"><span class="ico">📖</span><b>Aprende con la política</b><small>Cada respuesta indica en qué documento se basa.</small></div>
+   <div class="rule"><span class="ico">⭐</span><b>Calificación de 1 a 10</b><small>Al terminar, recibes una nota según tu desempeño.</small></div>
+  </div>
+  <div class="score" aria-label="Puntos de confianza">${bolts(MAXTRUST)}</div>
+  <p style="margin:22px 0 8px">Si pierdes todos los puntos, el proceso fallará.<br><b>¿Podrás llevar el caso a buen puerto?</b></p>
+  <button class="btn" id="go" disabled>Selecciona un recorrido para comenzar</button>
+  <p class="note">Los personajes y hechos son ficticios. El juego es informativo y no sustituye el análisis del Comité de Atención y Seguimiento. En la vida real, si vives o conoces un caso: denuncias@viveenergia.com.</p>
+  </section>`;
+  let pick=null;
+  const go=document.getElementById('go');
+  document.querySelectorAll('.role').forEach(b=>b.onclick=()=>{
+    pick=b.dataset.r;
+    document.querySelectorAll('.role').forEach(x=>{const on=x===b;x.classList.toggle('sel',on);x.setAttribute('aria-checked',on)});
+    go.disabled=false;go.textContent=ROLES[pick].start;
+  });
+  go.onclick=()=>{if(pick)startRole(pick)};
+}
+
+
+const RES={
+ evaluador:{closed:'Caso cerrado',
+  fail:['El proceso falló','Perdiste la confianza de Ana y del proceso. Cuando las decisiones son tardías o incorrectas, las personas dejan de denunciar. Repasa los documentos e inténtalo de nuevo.'],
+  full:['Caso resuelto con plena confianza','Acompañaste a Ana en cada etapa, protegiste la confidencialidad y el debido proceso, y ella confía en el mecanismo de Vive Energía.'],
+  solid:['Caso resuelto con confianza sólida','El proceso llegó a buen puerto, aunque algunas decisiones pudieron mejorar. Repasa las etapas donde perdiste confianza.'],
+  low:['Caso resuelto por poco','El caso se resolvió, pero la confianza quedó muy frágil. Revisa el Protocolo y la Guía para reforzar tu actuación.']},
+ evaluado:{closed:'Caso cerrado',
+  fail:['El proceso falló','El procedimiento se complicó por tus decisiones: faltó cooperación y cuidado con las medidas, la confidencialidad y las represalias. Repasa los documentos e inténtalo de nuevo.'],
+  full:['Caso resuelto con plena confianza','Cooperaste con el procedimiento, respetaste las medidas y evitaste represalias. Así se protege a todas las personas y se construye un entorno libre de violencia.'],
+  solid:['Caso resuelto con confianza sólida','El proceso llegó a buen puerto, aunque algunas decisiones pudieron mejorar. Repasa las etapas donde perdiste confianza.'],
+  low:['Caso resuelto por poco','El caso se resolvió, pero la confianza quedó muy frágil. Revisa el Protocolo y la Guía para reforzar tu actuación.']},
+ codigo:{closed:'Módulo concluido',
+  fail:['La integridad se vio comprometida','Tus decisiones pusieron en riesgo a las personas y a la empresa. Repasa el Código de Ética y vuelve a intentarlo.'],
+  full:['Integridad en cada decisión','Actuaste con criterio ético ante los dilemas del día a día: seguridad, anticorrupción, conflictos de interés, terceros, información y denuncia.'],
+  solid:['Buen criterio ético','Tu actuación fue sólida, aunque algunas decisiones pudieron mejorar. Repasa los temas donde perdiste confianza.'],
+  low:['Integridad por reforzar','Lograste concluir el módulo, pero con dudas importantes. Revisa el Código de Ética para reforzar tu actuación.']}
+};
+
+function startRole(r){st=newState(r);scene()}
+
+function hud(){
+  const s=SC()[st.i];
+  return `<div class="hud">
+   <div class="trust">Puntos de confianza <span style="display:flex;gap:4px" id="tb">${bolts(st.trust)}</span></div>
+   <div class="count"><span class="rolechip">${ROLES[st.role].name}</span> Decisión ${st.i+1} / ${SC().length} · <span id="sec">${TIME}</span> s</div></div>
+   <div class="steps" aria-label="Etapa del Protocolo">${PH().map((p,k)=>`<div class="step ${k<s.ph?'done':k===s.ph?'cur':''}"><i></i>${p}</div>`).join('')}</div>
+   <div class="timer" id="tm"><b id="tmb"></b></div>`;
+}
+
+function scene(){
+  const s=SC()[st.i];
+  setAerojandro(true);
+  st.opts=shuffle(s.opts);st.locked=false;
+  app.innerHTML=hud()+`<article class="card">
+   <div class="phase">Etapa ${s.ph+1} · ${PH()[s.ph]}</div>
+   <h2>${s.title}</h2>
+   <p class="narr">${s.narr}</p>
+   <div class="bubble"><div class="av ${s.alt?'alt':''}">${s.who[0]}</div><div class="say"><small>${s.who}</small>${s.say}</div></div>
+   <div class="q">${s.q}</div>
+   <div class="opts" id="opts">${st.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="k">${'ABCD'[k]}</span><span>${o.t}</span></button>`).join('')}</div>
+   <div id="fbx"></div>
+  </article>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>choose(+b.dataset.k));
+  startTimer();
+  window.scrollTo({top:0});
+}
+
+function startTimer(){
+  clearInterval(st.t);
+  const t0=Date.now(),b=document.getElementById('tmb'),tm=document.getElementById('tm'),sec=document.getElementById('sec');
+  st.left=TIME;
+  st.t=setInterval(()=>{
+    const left=Math.max(0,TIME-(Date.now()-t0)/1000);
+    st.left=left;
+    b.style.width=(left/TIME*100)+'%';sec.textContent=Math.ceil(left);
+    tm.classList.toggle('low',left<=15);
+    if(left<=0){clearInterval(st.t);resolve(-1)}
+  },100);
+}
+
+function choose(k){if(st.locked)return;clearInterval(st.t);resolve(k)}
+
+function resolve(k){
+  if(st.locked)return;st.locked=true;
+  const s=SC()[st.i],btns=[...document.querySelectorAll('.opt')];
+  const good=k>=0&&st.opts[k].ok, timeout=k<0;
+  btns.forEach((b,j)=>{b.disabled=true;
+    if(st.opts[j].ok)b.classList.add('ok');
+    else if(j===k)b.classList.add('bad');
+    else b.classList.add('dim');});
+  if(!good){st.trust--;const tb=document.getElementById('tb');tb.innerHTML=bolts(st.trust);const hb=tb.querySelectorAll('.bolt')[st.trust];if(hb)hb.classList.add('hit')}
+  st.log.push({t:s.title,ok:good,src:s.src.split(' · ')[0],left:good?st.left:0});
+  const correct=st.opts.find(o=>o.ok);
+  const msg=good?correct.fb:(timeout?'Se acabó el tiempo: en un caso real, la demora también afecta a las personas. La respuesta adecuada era la marcada en verde. '+correct.fb:st.opts[k].fb+' <br><br><b>Lo adecuado:</b> '+correct.fb);
+  const last=st.i===SC().length-1, dead=st.trust<=0;
+  document.getElementById('fbx').innerHTML=`<div class="fb ${good?'good':'bad'}">
+    <h3>${good?'✔ Decisión acertada':timeout?'⏱ Tiempo agotado · −1 punto de confianza':'✘ Decisión equivocada · −1 punto de confianza'}</h3>
+    <p>${msg}</p><div class="src">📖 ${s.src}</div>
+    <button class="btn" id="next">${dead?'Ver resultado':last?'Ver resultado final':'Continuar'}</button></div>`;
+  const nx=document.getElementById('next');nx.focus();
+  nx.onclick=()=>{ if(dead||last){end(dead)} else {st.i++;scene()} };
+}
+
+/* Calificación 1 a 10: 85 % por decisiones acertadas y 15 % por rapidez en los aciertos
+   (se considera rapidez plena con 30 s o más restantes en promedio). Las decisiones sin responder cuentan como no acertadas. */
+function grade(){
+  const total=SC().length, hits=st.log.filter(l=>l.ok);
+  const acc=hits.length/total;
+  const avg=hits.length?hits.reduce((a,l)=>a+l.left,0)/hits.length:0;
+  const speed=Math.min(1,avg/30);
+  const raw=1+9*acc*(0.85+0.15*speed);
+  return {n:Math.max(1,Math.min(10,Math.round(raw))),hits:hits.length,total:total,avg:avg};
+}
+const GRADE_TXT={10:['Sobresaliente','Dominas el Protocolo y lo aplicas con precisión y rapidez.'],9:['Excelente','Tu actuación fue sólida en casi todas las etapas del Protocolo.'],8:['Muy bien','Aplicas bien el Protocolo; afina los puntos donde dudaste.'],7:['Bien','Vas por buen camino; repasa las decisiones que fallaste.'],6:['Suficiente','Conoces lo básico, pero conviene reforzar varias etapas del Protocolo.'],5:['Por reforzar','Necesitas repasar el Protocolo y la Guía antes de actuar en un caso real.'],4:['Por reforzar','Necesitas repasar el Protocolo y la Guía antes de actuar en un caso real.'],3:['Por reforzar','Necesitas repasar el Protocolo y la Guía antes de actuar en un caso real.'],2:['Por reforzar','Necesitas repasar el Protocolo y la Guía antes de actuar en un caso real.'],1:['Por reforzar','Necesitas repasar el Protocolo y la Guía antes de actuar en un caso real.']};
+
+function end(failed){
+  clearInterval(st.t);
+  setAerojandro(false);
+  const sc=SC(), others=Object.keys(ROLES).filter(k=>k!==st.role);
+  for(let i=st.log.length;i<sc.length;i++)st.log.push({t:sc[i].title,ok:false,skipped:true,src:sc[i].src.split(' · ')[0],left:0});
+  const g=grade(), n=st.trust, gt=GRADE_TXT[g.n];
+  const R=RES[st.role];
+  const pickR=failed?R.fail:n===3?R.full:n===2?R.solid:R.low;
+  const title=pickR[0], txt=pickR[1];
+  const cls=g.n>=8?'hi':g.n>=6?'mid':'lo';
+  app.innerHTML=`<section class="card center"><div class="kicker">${failed?'Fin del juego':RES[st.role].closed} · ${ROLES[st.role].tag}</div>
+   <h2>${title}</h2>
+   <div class="grade ${cls}" aria-label="Calificación ${g.n} de 10"><span class="num">${g.n}</span><span class="of">/ 10</span></div>
+   <div class="glabel">${gt[0]}</div>
+   <p style="max-width:620px;margin:8px auto 0">${txt} ${gt[1]}</p>
+   <div class="stats">
+    <div><b>${g.hits} / ${g.total}</b><span>decisiones acertadas</span></div>
+    <div><b>${g.hits?Math.round(g.avg)+' s':'—'}</b><span>tiempo restante promedio en aciertos</span></div>
+    <div class="trustcell"><b>${bolts(n)}</b><span>puntos de confianza</span></div>
+   </div>
+   <p class="note" style="margin-top:14px">Cómo se calcula: 85 % por decisiones acertadas y 15 % por rapidez en los aciertos (30 s restantes o más cuentan como rapidez plena). Las decisiones sin responder cuentan como no acertadas.</p></section>
+   <section class="card"><h3 style="margin-bottom:12px">Tu recorrido</h3><div class="recap">
+    ${st.log.map(l=>`<div class="rrow"><span class="m ${l.ok?'ok':'no'}">${l.ok?'✓':'✕'}</span>${l.t}${l.skipped?' <em>(sin responder)</em>':''}<span class="s">${l.src}</span></div>`).join('')}
+   </div></section>
+   <section class="card"><h3>Las reglas de oro</h3><div class="gold">
+    <div><b>Respeta el espacio personal</b>Hablar muy cerca, tocar el hombro o saludar de beso es común, pero a algunas personas les molesta.</div>
+    <div><b>No supongas</b>Lo que para ti es normal puede no serlo para otra persona. Si dudas, abstente o pregunta.</div>
+    <div><b>Consentimiento</b>Debe ser libre, expreso, específico y revocable. El silencio no es consentimiento.</div>
+    <div><b>Comunica</b>Si algo te incomoda, dilo. Si crees vivir violencia, no tengas miedo: denúncialo.</div></div>
+    <div class="contact"><b>¿Vives o conoces un caso real?</b><br>Escribe a <a href="mailto:denuncias@viveenergia.com">denuncias@viveenergia.com</a>, acude a la Secretaría Ejecutiva o a una persona consejera del Comité, o usa los buzones de quejas de las oficinas de Mérida y Ciudad de México. Teléfonos: 99 9219 7812 · 55 8554 7868. Cero tolerancia a la violencia laboral, el acoso y el hostigamiento.</div>
+    <div class="center btns"><button class="btn" id="again">Jugar de nuevo</button>${others.map(o=>`<button class="btn ghost" data-o="${o}">Probar: ${ROLES[o].name}</button>`).join('')}</div></section>`;
+  document.getElementById('again').onclick=intro;
+  document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>startRole(b.dataset.o));
+  window.scrollTo({top:0});
+}
+document.addEventListener('keydown',e=>{
+  const k='1234'.indexOf(e.key);
+  if(k>=0&&st&&st.opts&&!st.locked&&!majiEl.panel.classList.contains('open')&&document.querySelectorAll('.opt').length)choose(k);
+});
+intro();
+</script>
+</body>
+</html>
