@@ -203,11 +203,28 @@ footer{position:relative;z-index:2;text-align:center;font-size:13px;color:var(--
 
 /* ===== Acuse de recibo ===== */
 a.btn{display:inline-block;text-decoration:none}
-.acuse{display:flex;gap:18px;align-items:flex-start;text-align:left;border-color:var(--green);background:linear-gradient(135deg,#ffffff,#e9f9f2)}
+.acuse{text-align:left;border-color:var(--green);background:linear-gradient(135deg,#ffffff,#e9f9f2)}
+.acuse-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
 .acuse-ico{flex:0 0 56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--green));display:grid;place-items:center;font-size:28px}
-.acuse-body h3{margin-bottom:6px}
-.acuse-body p{margin-bottom:14px}
-@media (max-width:640px){.acuse{flex-direction:column}}
+.acuse-head h3{margin-bottom:4px}
+.af-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px}
+.acuse-form label{display:block;font-family:var(--h);font-weight:600;font-size:12.5px;letter-spacing:.04em;color:var(--white)}
+.acuse-form input[type=text]{display:block;width:100%;margin-top:5px;padding:11px 13px;font:inherit;font-size:17px;font-weight:400;letter-spacing:0;color:var(--text);background:#fff;border:2px solid var(--line);border-radius:12px}
+.acuse-form input[type=text]:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,111,173,.18)}
+.acuse-form input[readonly]{background:#eef5f8;color:var(--muted)}
+.af-docs{margin:16px 0 4px;border:2px solid var(--line);border-radius:14px;padding:10px 14px 6px;background:#fff}
+.af-docs legend{font-family:var(--h);font-weight:700;font-size:13px;color:var(--white);padding:0 6px}
+.af-check{display:flex!important;gap:10px;align-items:flex-start;font-family:var(--b)!important;font-weight:400!important;font-size:16px!important;letter-spacing:0!important;color:var(--text)!important;margin:7px 0;cursor:pointer}
+.af-check input{flex:0 0 22px;width:22px;height:22px;margin-top:1px;accent-color:var(--green);cursor:pointer}
+.af-sign{margin-top:14px}
+.af-sign-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--h);font-weight:600;font-size:12.5px;letter-spacing:.04em;color:var(--white);margin-bottom:5px}
+.af-clear{font:inherit;font-size:14px;background:none;border:0;color:var(--blue);cursor:pointer;text-decoration:underline}
+#af_canvas{display:block;width:100%;height:170px;background:#fff;border:2px dashed #7fb6cf;border-radius:14px;touch-action:none;cursor:crosshair}
+.af-sign small{display:block;color:var(--muted);font-size:14px;margin-top:4px}
+.af-msg{min-height:24px;margin:12px 0 4px;font-weight:600;color:var(--blue)}
+.acuse .btns{justify-content:flex-start;margin-top:6px}
+.acuse .btn:disabled{opacity:.6}
+@media (max-width:640px){.af-grid{grid-template-columns:1fr}.acuse-head{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -831,6 +848,56 @@ const RES={
   low:['Integridad por reforzar','Lograste concluir el módulo, pero con dudas importantes. Revisa el Código de Ética para reforzar tu actuación.']}
 };
 
+
+const ACUSE_DOCS=[['VE-3-PO-01','Reglamento Interior de Trabajo'],['VE-3-PO-03','Código de Ética'],['VE-5-PO-04','Política de Cero Tolerancia a la Violencia Laboral, Acoso y Hostigamiento Sexual'],['VE-5-PR-04','Protocolo de Identificación, Prevención, Actuación y Remediación de la Violencia Laboral, Acoso y Hostigamiento'],['VE-5-I-04','Guía auxiliar para identificar la violencia laboral'],['VE-5-PO-03','Política de Prevención de Riesgos Psicosociales']];
+const PDFLIB_SRC='lib/pdf-lib.min.js'; /* copia local de pdf-lib (MIT); se carga solo al generar el acuse */
+function loadPdfLib(){
+  if(window.PDFLib)return Promise.resolve();
+  return new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src=PDFLIB_SRC;sc.onload=ok;sc.onerror=()=>ko(new Error('pdf-lib'));document.head.appendChild(sc)});
+}
+function initAcuse(nota){
+  const c=document.getElementById('af_canvas'),ctx=c.getContext('2d'),msg=document.getElementById('af_msg');
+  const fit=()=>{const r=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=Math.max(1,Math.round(r.width*dpr));c.height=Math.max(1,Math.round(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#0b3a56'};
+  fit();
+  let drawing=false,last=null,dirty=false;
+  const pos=e=>{const r=c.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+  const seg=(a,b)=>{ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();dirty=true};
+  c.addEventListener('pointerdown',e=>{e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}drawing=true;last=pos(e);seg(last,{x:last.x+.01,y:last.y})});
+  c.addEventListener('pointermove',e=>{if(!drawing)return;e.preventDefault();const p=pos(e);seg(last,p);last=p});
+  const stop=()=>{drawing=false};
+  c.addEventListener('pointerup',stop);c.addEventListener('pointercancel',stop);c.addEventListener('pointerleave',stop);
+  document.getElementById('af_clear').onclick=()=>{ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height);ctx.restore();dirty=false};
+  const val=id=>document.getElementById(id).value.trim();
+  document.getElementById('acuseForm').onsubmit=async ev=>{
+    ev.preventDefault();
+    if(!val('af_nombre')){msg.textContent='Escribe tu nombre completo.';document.getElementById('af_nombre').focus();return}
+    if(!dirty){msg.textContent='Falta tu firma: dibújala con el ratón o con el dedo.';return}
+    const btn=document.getElementById('af_go');btn.disabled=true;msg.textContent='Generando tu acuse…';
+    try{
+      await loadPdfLib();
+      const resp=await fetch(ACUSE_PDF);if(!resp.ok)throw new Error('plantilla');
+      const pdf=await PDFLib.PDFDocument.load(await resp.arrayBuffer());
+      const form=pdf.getForm();
+      const set=(n,v)=>form.getTextField(n).setText(v);
+      set('nombre',val('af_nombre'));set('empleado',val('af_empleado'));set('puesto',val('af_puesto'));set('area',val('af_area'));set('fecha',val('af_fecha'));set('resultado',nota+' / 10');
+      ACUSE_DOCS.forEach((d,i)=>{const cb=form.getCheckBox('doc'+(i+1));document.getElementById('af_doc'+i).checked?cb.check():cb.uncheck()});
+      const img=await pdf.embedPng(c.toDataURL('image/png'));
+      const bx={x:212,y:128,w:328,h:43}; /* celda "Firma" del formato (coordenadas PDF) */
+      const k=Math.min(bx.w/img.width,bx.h/img.height),w=img.width*k,h=img.height*k;
+      pdf.getPage(0).drawImage(img,{x:bx.x+(bx.w-w)/2,y:bx.y+(bx.h-h)/2,width:w,height:h});
+      const bytes=await pdf.save();
+      const blob=new Blob([bytes],{type:'application/pdf'});
+      const nom=val('af_nombre').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||'persona';
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Acuse_de_recibo_'+nom+'.pdf';document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+      msg.textContent='Listo: se descargó tu acuse firmado. Entrégalo a Recursos Humanos.';
+    }catch(err){
+      msg.textContent='No fue posible generar el PDF en esta ventana. Abre el juego desde su dirección web o descarga el formato en blanco, llénalo y fírmalo.';
+    }
+    btn.disabled=false;
+  };
+}
+
 function startRole(r){st=newState(r);scene()}
 
 function hud(){
@@ -929,13 +996,38 @@ function end(failed){
     <div class="trustcell"><b>${bolts(n)}</b><span>puntos de confianza</span></div>
    </div>
    <p class="note" style="margin-top:14px">Cómo se calcula: 85 % por decisiones acertadas y 15 % por rapidez en los aciertos (30 s restantes o más cuentan como rapidez plena). Las decisiones sin responder cuentan como no acertadas.</p></section>
-   <section class="card acuse">
-    <div class="acuse-ico" aria-hidden="true">📄</div>
-    <div class="acuse-body">
-     <h3>Acuse de recibo de políticas</h3>
-     <p>Al concluir El Caso Práctico, todas las personas reciben el acuse, sin importar su calificación. Descárgalo, anota tu resultado (<b>${g.n} / 10</b>), fírmalo y entrégalo a Recursos Humanos.</p>
-     <a class="btn" id="acuseBtn" href="${ACUSE_PDF}" download target="_blank" rel="noopener">Descargar acuse de recibo (PDF)</a>
+   <section class="card acuse" id="acuse">
+    <div class="acuse-head">
+     <div class="acuse-ico" aria-hidden="true">📄</div>
+     <div>
+      <h3>Acuse de recibo de políticas</h3>
+      <p>Al concluir El Caso Práctico, todas las personas llenan el acuse, sin importar su calificación. Complétalo aquí, firma con el ratón o con el dedo y descarga el PDF para entregarlo a Recursos Humanos.</p>
+     </div>
     </div>
+    <form id="acuseForm" class="acuse-form" autocomplete="off" novalidate>
+     <div class="af-grid">
+      <label>Nombre completo<input id="af_nombre" type="text" maxlength="120" autocomplete="name"></label>
+      <label>Número de empleado<input id="af_empleado" type="text" maxlength="30" inputmode="numeric"></label>
+      <label>Puesto<input id="af_puesto" type="text" maxlength="80"></label>
+      <label>Área / centro de trabajo<input id="af_area" type="text" maxlength="80"></label>
+      <label>Fecha<input id="af_fecha" type="text" maxlength="20" value="${new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'})}"></label>
+      <label>Resultado en El Caso Práctico<input id="af_resultado" type="text" value="${g.n} / 10" readonly></label>
+     </div>
+     <fieldset class="af-docs"><legend>Declaro que recibí y leí los siguientes documentos</legend>
+      ${ACUSE_DOCS.map((d,i)=>`<label class="af-check"><input type="checkbox" id="af_doc${i}"><span><b>${d[0]}</b> · ${d[1]}</span></label>`).join('')}
+     </fieldset>
+     <div class="af-sign">
+      <div class="af-sign-top"><span>Firma</span><button type="button" class="af-clear" id="af_clear">Borrar firma</button></div>
+      <canvas id="af_canvas" aria-label="Espacio para firmar con el ratón o con el dedo"></canvas>
+      <small>Dibuja tu firma con el ratón o con el dedo en la pantalla.</small>
+     </div>
+     <p id="af_msg" class="af-msg" role="status" aria-live="polite"></p>
+     <div class="btns">
+      <button type="submit" class="btn" id="af_go">Generar acuse firmado (PDF)</button>
+      <a class="btn ghost" id="acuseBtn" href="${ACUSE_PDF}" download target="_blank" rel="noopener">Descargar formato en blanco</a>
+     </div>
+     <p class="note">Tus datos y tu firma no se envían a ningún servidor: el PDF se genera en tu propio dispositivo.</p>
+    </form>
    </section>
    <section class="card"><h3 style="margin-bottom:12px">Tu recorrido</h3><div class="recap">
     ${st.log.map(l=>`<div class="rrow"><span class="m ${l.ok?'ok':'no'}">${l.ok?'✓':'✕'}</span>${l.t}${l.skipped?' <em>(sin responder)</em>':''}<span class="s">${l.src}</span></div>`).join('')}
@@ -947,6 +1039,7 @@ function end(failed){
     <div><b>Comunica</b>Si algo te incomoda, dilo. Si crees vivir violencia, no tengas miedo: denúncialo.</div></div>
     <div class="contact"><b>¿Vives o conoces un caso real?</b><br>Escribe a <a href="mailto:denuncias@viveenergia.com">denuncias@viveenergia.com</a>, acude a la Secretaría Ejecutiva o a una persona consejera del Comité, o usa los buzones de quejas de las oficinas de Mérida y Ciudad de México. Teléfonos: 99 9219 7812 · 55 8554 7868. Cero tolerancia a la violencia laboral, el acoso y el hostigamiento.</div>
     <div class="center btns"><button class="btn" id="again">Jugar de nuevo</button>${others.map(o=>`<button class="btn ghost" data-o="${o}">Probar: ${ROLES[o].name}</button>`).join('')}</div></section>`;
+  initAcuse(g.n);
   document.getElementById('again').onclick=intro;
   document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>startRole(b.dataset.o));
   window.scrollTo({top:0});
