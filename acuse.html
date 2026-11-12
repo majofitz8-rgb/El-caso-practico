@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Acuse de recibo · Vive Energía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#006fad; --cyan:#0090c9; --green:#12b878; --ink:#0b3a56; --text:#1e3b4a; --muted:#5f7886;
+  --line:#bfd2d8; --zebra:#eff3fc; --label:#eff6f0; --bg:#e6eff4;
+  --h:'Montserrat',Arial,Helvetica,sans-serif; --b:'Titillium Web','Montserrat',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--b);font-size:17px;line-height:1.45;color:var(--text);background:var(--bg);padding:0 0 40px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.toolbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 22px;background:linear-gradient(100deg,#006fad,#0a9bc4 60%,#12b878);box-shadow:0 4px 16px rgba(0,111,173,.25)}
+.toolbar a{color:#fff;font-family:var(--h);font-weight:600;font-size:14px;text-decoration:none}
+.toolbar a:hover{text-decoration:underline}
+.btn{font-family:var(--h);font-weight:700;font-size:15px;border:0;border-radius:999px;padding:12px 26px;cursor:pointer;color:var(--blue);background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.btn:hover{background:#eaf6fc}
+:focus-visible{outline:3px solid #79ecff;outline-offset:2px}
+.hint{max-width:816px;margin:16px auto 0;padding:0 18px;font-size:15.5px;color:var(--muted)}
+.msg{max-width:816px;margin:8px auto 0;padding:0 18px;min-height:24px;font-weight:600;color:#c0334f}
+
+/* ===== Hoja (mismo formato del PDF) ===== */
+.sheet{max-width:816px;margin:14px auto 0;background:#fff;padding:44px 46px 34px;box-shadow:0 12px 34px rgba(7,40,70,.18);border-radius:6px}
+.brand{font-family:var(--h);font-weight:800;font-size:15px;letter-spacing:.02em;color:var(--blue)}
+h1{font-family:var(--h);font-weight:800;font-size:40px;line-height:1.1;color:var(--ink);margin:14px 0 14px}
+.sub{font-size:20px;color:var(--muted)}
+.small{font-size:13.5px;color:var(--muted);margin:6px 0 14px}
+.decl{font-size:16px;margin-bottom:16px}
+.decl b{color:#000}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:middle}
+.docs thead th{background:var(--blue);color:#fff;font-family:var(--h);font-size:13px;font-weight:700;border-color:var(--blue)}
+.docs tbody tr:nth-child(even){background:var(--zebra)}
+.docs td:first-child{width:34px}
+.docs td:nth-child(2){width:100px;white-space:nowrap}
+.docs td:last-child,.docs th:last-child{width:104px;text-align:center}
+.canales{font-size:16px;margin:24px 0 18px}
+.canales b{color:#000}
+.form th{width:210px;background:var(--label);font-family:var(--h);font-size:13px;font-weight:700;color:#000}
+.form th.small-th{font-size:11.5px}
+.form td{height:44px}
+input[type=text]{font:inherit;font-size:16px;color:var(--text);background:transparent;border:0;border-bottom:1.5px dotted #9db8c3;border-radius:0;padding:4px 2px;width:100%}
+input[type=text]:focus{outline:none;border-bottom:2px solid var(--blue);background:#f4fafd}
+.inl{width:96px!important;text-align:center}
+.res-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 20px}
+.res-row .lab{white-space:nowrap}
+.chk{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.chk input{position:absolute;opacity:0;width:20px;height:20px;margin:0}
+.chk span{display:inline-block;width:20px;height:20px;border:2px solid var(--blue);border-radius:4px;background:#fff;position:relative}
+.chk input:checked+span{background:var(--blue)}
+.chk input:checked+span::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.chk input:focus-visible+span{outline:3px solid #79ecff;outline-offset:2px}
+.sign-cell{padding:6px 8px!important}
+#sig{display:block;width:100%;aspect-ratio:3/1;background:#fff;touch-action:none;cursor:crosshair;border:1.5px dashed #7fb6cf;border-radius:6px}
+.clear{margin-top:5px;font:inherit;font-size:14px;background:none;border:0;color:var(--blue);text-decoration:underline;cursor:pointer}
+.rh th{font-size:11.5px}
+.rh td{font-size:14px}
+.rh-row{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center}
+.rh-row label{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.rh-row input[type=text]{width:210px}
+.rh-row .d{width:130px}
+.foundation{margin-top:22px;font-size:11.5px;line-height:1.5;color:#8aa0ab}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .toolbar{padding:10px 14px}
+  .sheet{padding:24px 16px 22px;border-radius:0}
+  h1{font-size:32px}.sub{font-size:17px}
+  table{font-size:13.5px}
+  th,td{padding:6px 6px}
+  .docs td:nth-child(2){width:84px}
+  .docs td:last-child,.docs th:last-child{width:62px}
+  .form th{width:96px;font-size:11.5px}
+  .rh-row input[type=text]{width:100%}.rh-row label{width:100%}.rh-row .d{width:100%}
+}
+
+/* ===== Impresión: hoja carta, sin controles ===== */
+@page{size:Letter;margin:11mm 13mm}
+@media print{
+  html,body{background:#fff}
+  body{padding:0;font-size:10.5pt;line-height:1.35}
+  .no-print{display:none!important}
+  .sheet{max-width:none;margin:0;padding:0;box-shadow:none;border-radius:0}
+  h1{font-size:26pt;margin:8px 0 8px}.sub{font-size:12.5pt}.small{font-size:9pt;margin:4px 0 10px}
+  .decl{font-size:10.5pt;margin-bottom:10px}
+  table{font-size:9.5pt}
+  th,td{padding:4px 8px}
+  .docs td{padding:3px 8px}
+  .canales{font-size:10.5pt;margin:14px 0 10px}
+  .form td{height:28px}
+  input[type=text]{border-bottom:0;font-size:10.5pt;color:#000;padding:1px 2px}
+  .chk span{width:16px;height:16px}
+  .chk input:checked+span::after{left:3.5px;top:0;width:4px;height:8px}
+  .sign-cell{padding:3px 6px!important}
+  #sig{border:0;aspect-ratio:5/1}
+  .res-row{gap:4px 16px}
+  .foundation{margin-top:12px;font-size:8pt;color:#7a909a}
+  .docs,.form,tr{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar no-print">
+  <a href="index.html">← Volver al juego</a>
+  <button class="btn" id="btnPrint" type="button">Imprimir / Guardar como PDF</button>
+</div>
+<p class="hint no-print">Marca los documentos que recibiste y leíste, llena tus datos con el teclado y firma con el ratón o con el dedo. Después pulsa <b>Imprimir / Guardar como PDF</b>; en el cuadro de impresión elige <b>Guardar como PDF</b> (o tu impresora) y desactiva los <b>encabezados y pies de página</b>. Tus datos no se envían a ningún servidor.</p>
+<p class="msg no-print" id="msg" role="status" aria-live="polite"></p>
+
+<main class="sheet">
+  <div class="brand">VIVE ENERGÍA</div>
+  <h1>Acuse de recibo</h1>
+  <p class="sub">Reglamento, Código de Ética y políticas de prevención de la violencia laboral</p>
+  <p class="small">Formato para firma de la persona colaboradora · Entregar a Recursos Humanos</p>
+  <p class="decl">Declaro que <b>recibí, leí y comprendí</b> los siguientes documentos de Vive Energía, que <b>me comprometo a cumplirlos</b> y que conozco los canales para denunciar cualquier acto de violencia laboral, acoso u hostigamiento sexual:</p>
+
+  <table class="docs">
+    <thead><tr><th>#</th><th>Código</th><th>Documento</th><th>Recibí y leí</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>VE-3-PO-01</td><td>Reglamento Interior de Trabajo</td><td><label class="chk"><input type="checkbox" id="doc1" aria-label="Recibí y leí: Reglamento Interior de Trabajo"><span></span></label></td></tr>
+      <tr><td>2</td><td>VE-3-PO-03</td><td>Código de Ética</td><td><label class="chk"><input type="checkbox" id="doc2" aria-label="Recibí y leí: Código de Ética"><span></span></label></td></tr>
+      <tr><td>3</td><td>VE-5-PO-04</td><td>Política de Cero Tolerancia a la Violencia Laboral, Acoso y Hostigamiento Sexual</td><td><label class="chk"><input type="checkbox" id="doc3" aria-label="Recibí y leí: Política de Cero Tolerancia"><span></span></label></td></tr>
+      <tr><td>4</td><td>VE-5-PR-04</td><td>Protocolo de Identificación, Prevención, Actuación y Remediación de la Violencia Laboral, Acoso y Hostigamiento</td><td><label class="chk"><input type="checkbox" id="doc4" aria-label="Recibí y leí: Protocolo"><span></span></label></td></tr>
+      <tr><td>5</td><td>VE-5-I-04</td><td>Guía auxiliar para identificar la violencia laboral</td><td><label class="chk"><input type="checkbox" id="doc5" aria-label="Recibí y leí: Guía auxiliar"><span></span></label></td></tr>
+      <tr><td>6</td><td>VE-5-PO-03</td><td>Política de Prevención de Riesgos Psicosociales</td><td><label class="chk"><input type="checkbox" id="doc6" aria-label="Recibí y leí: Política de Prevención de Riesgos Psicosociales"><span></span></label></td></tr>
+    </tbody>
+  </table>
+
+  <p class="canales"><b>Canales de denuncia:</b> denuncias@viveenergia.com · 99 9219 7812 · 55 8554 7868 · Secretaría Ejecutiva (Recursos Humanos) o una persona consejera del Comité de Atención y Seguimiento. Está prohibida cualquier represalia contra quien denuncie de buena fe.</p>
+
+  <table class="form">
+    <tr><th>Evaluación "El Caso Práctico"</th>
+      <td><div class="res-row"><span class="lab">Resultado: <input type="text" id="f_res" class="inl" maxlength="12" aria-label="Resultado"></span>
+        <label class="chk"><input type="checkbox" id="f_apr"><span></span>Aprobada</label>
+        <label class="chk"><input type="checkbox" id="f_nap"><span></span>No aprobada</label></div></td></tr>
+    <tr><th>Nombre completo</th><td><input type="text" id="f_nombre" maxlength="120" autocomplete="name" aria-label="Nombre completo"></td></tr>
+    <tr><th>Número de empleado</th><td><input type="text" id="f_emp" maxlength="30" inputmode="numeric" aria-label="Número de empleado"></td></tr>
+    <tr><th>Puesto</th><td><input type="text" id="f_puesto" maxlength="80" aria-label="Puesto"></td></tr>
+    <tr><th>Área / centro de trabajo</th><td><input type="text" id="f_area" maxlength="80" aria-label="Área o centro de trabajo"></td></tr>
+    <tr><th>Fecha</th><td><input type="text" id="f_fecha" maxlength="20" aria-label="Fecha"></td></tr>
+    <tr><th>Firma</th><td class="sign-cell"><canvas id="sig" aria-label="Espacio para firmar con el ratón o con el dedo"></canvas><button type="button" class="clear no-print" id="clear">Borrar firma</button></td></tr>
+    <tr class="rh"><th>Para uso de Recursos Humanos</th>
+      <td><div class="rh-row"><label>Recibido por: <input type="text" id="f_rhp" maxlength="80" aria-label="Recibido por"></label><label>Fecha: <input type="text" id="f_rhf" class="d" maxlength="20" aria-label="Fecha de recepción"></label></div></td></tr>
+  </table>
+
+  <p class="foundation">Fundamento: Protocolo VE-5-PR-04, apartado 7.3: el personal de nuevo ingreso conoce la Política de Cero Tolerancia y el Protocolo durante su inducción y firma el acuse correspondiente. Los datos de este formato se tratan de forma confidencial conforme a la Política para el Manejo de Datos Personales (VE-0-PO-02).</p>
+</main>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id), msg=$('msg');
+  /* Resultado que envía el juego en la dirección: acuse.html#nota=8 (el fragmento # no se envía a ningún servidor) */
+  const m=(location.hash||'').match(/nota=(\d{1,2})/), nota=m?+m[1]:0;
+  if(nota>=1&&nota<=10)$('f_res').value=nota+' / 10';
+  $('f_fecha').value=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  /* Firma con ratón, dedo o lápiz */
+  const c=$('sig'),ctx=c.getContext('2d');let drawing=false,last=null,dirty=false;
+  const fit=()=>{const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.max(1,Math.round(r.width*d));c.height=Math.max(1,Math.round(r.height*d));ctx.setTransform(d,0,0,d,0,0);ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#0b3a56'};
+  fit();window.addEventListener('resize',()=>{if(!dirty)fit()});
+  const pos=e=>{const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  const seg=(a,b)=>{ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();dirty=true};
+  c.addEventListener('pointerdown',e=>{e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}drawing=true;last=pos(e);seg(last,{x:last.x+.01,y:last.y})});
+  c.addEventListener('pointermove',e=>{if(!drawing)return;e.preventDefault();const p=pos(e);seg(last,p);last=p});
+  const stop=()=>{drawing=false};['pointerup','pointercancel','pointerleave'].forEach(t=>c.addEventListener(t,stop));
+  $('clear').onclick=()=>{ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height);ctx.restore();dirty=false};
+
+  /* Imprimir / Guardar como PDF (el nombre sugerido sale del título de la página) */
+  $('btnPrint').onclick=()=>{
+    if(!$('f_nombre').value.trim()){msg.textContent='Escribe tu nombre completo antes de imprimir.';$('f_nombre').focus();return}
+    if(!dirty){msg.textContent='Falta tu firma: dibújala con el ratón o con el dedo.';c.scrollIntoView({block:'center'});return}
+    msg.textContent='';
+    const old=document.title;
+    const slug=$('f_nombre').value.trim().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||'persona';
+    document.title='Acuse_de_recibo_'+slug;
+    const back=()=>{document.title=old;window.removeEventListener('afterprint',back)};
+    window.addEventListener('afterprint',back);
+    window.print();
+    setTimeout(()=>{if(document.title!==old)document.title=old},60000);
+  };
+})();
+</script>
+</body>
+</html>
